@@ -6,6 +6,8 @@ declare global {
   }
 }
 
+// 为了解决循环引用问题，我们只在类型中使用任何DOM类型，而不在全局命名空间中声明它们
+
 // 这个接口定义了Web Speech API的SpeechRecognition对象
 export interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -514,5 +516,423 @@ export function createSpeechRecognizer(
     case 'web':
     default:
       return new WebSpeechRecognizer(config);
+  }
+}
+
+// ==================== 语音合成接口 ====================
+
+// 不再导出冲突的内置类型接口定义
+
+// 语音合成器配置
+export interface SpeechSynthesizerConfig {
+  apiKey?: string;
+  language?: string;
+  voice?: string;
+  rate?: number;
+  pitch?: number;
+  volume?: number;
+}
+
+// 语音合成器接口
+export interface SpeechSynthesizer {
+  speak(text: string): Promise<void>;
+  cancel(): Promise<void>;
+  pause(): Promise<void>;
+  resume(): Promise<void>;
+  isSpeaking(): boolean;
+  getVoices(): Promise<any[]>;
+  setVoice(voice: any | string): void;
+  setLanguage(language: string): void;
+  setRate(rate: number): void;
+  setPitch(pitch: number): void;
+  setVolume(volume: number): void;
+  onStart(callback: () => void): void;
+  onEnd(callback: () => void): void;
+  onError(callback: (error: Error) => void): void;
+}
+
+// Web Speech API TTS实现
+export class WebSpeechSynthesizer implements SpeechSynthesizer {
+  private synthesis: any = null;
+  private utterance: any = null;
+  private config: SpeechSynthesizerConfig;
+  private voice: any = null;
+  private speaking = false;
+  private onStartCallback: (() => void) | null = null;
+  private onEndCallback: (() => void) | null = null;
+  private onErrorCallback: ((error: Error) => void) | null = null;
+
+  constructor(config: SpeechSynthesizerConfig = {}) {
+    this.config = {
+      language: 'zh-CN',
+      rate: 1.0,
+      pitch: 1.0,
+      volume: 1.0,
+      ...config
+    };
+    this.initSynthesis();
+  }
+
+  private initSynthesis() {
+    if (typeof window === 'undefined') return;
+
+    try {
+      if (!window.speechSynthesis) {
+        throw new Error('浏览器不支持语音合成API');
+      }
+
+      this.synthesis = window.speechSynthesis;
+
+      // 尝试获取匹配语言的声音
+      this.loadVoices();
+      
+      // 某些浏览器需要等待声音加载
+      if (this.synthesis && 'onvoiceschanged' in this.synthesis) {
+        this.synthesis.onvoiceschanged = () => this.loadVoices();
+      }
+    } catch (error) {
+      console.error('初始化语音合成时出错:', error);
+      throw error;
+    }
+  }
+
+  private loadVoices() {
+    if (!this.synthesis) return;
+
+    const voices = this.synthesis.getVoices();
+    if (voices.length > 0) {
+      // 尝试找到匹配配置语言的声音
+      const lang = this.config.language || 'zh-CN';
+      let matchedVoice = null;
+      
+      // 如果指定了特定声音，优先使用
+      if (this.config.voice) {
+        matchedVoice = voices.find((v: any) => v.name === this.config.voice);
+      }
+      
+      // 否则找匹配语言的声音
+      if (!matchedVoice) {
+        matchedVoice = voices.find((v: any) => v.lang.startsWith(lang) && v.localService) ||
+                      voices.find((v: any) => v.lang.startsWith(lang));
+      }
+      
+      // 如果没有匹配的，使用默认
+      this.voice = matchedVoice || voices[0];
+    }
+  }
+
+  async speak(text: string): Promise<void> {
+    if (!this.synthesis) {
+      throw new Error('语音合成未初始化');
+    }
+
+    // 先取消当前正在播放的
+    this.synthesis.cancel();
+    
+    // 创建新的发声请求
+    if (window.SpeechSynthesisUtterance) {
+      this.utterance = new window.SpeechSynthesisUtterance(text);
+      
+      if (this.utterance) {
+        this.utterance.lang = this.config.language || 'zh-CN';
+        
+        if (this.voice) {
+          this.utterance.voice = this.voice;
+        }
+        
+        this.utterance.rate = this.config.rate || 1.0;
+        this.utterance.pitch = this.config.pitch || 1.0;
+        this.utterance.volume = this.config.volume || 1.0;
+        
+        this.utterance.onstart = () => {
+          this.speaking = true;
+          if (this.onStartCallback) {
+            this.onStartCallback();
+          }
+        };
+        
+        this.utterance.onend = () => {
+          this.speaking = false;
+          if (this.onEndCallback) {
+            this.onEndCallback();
+          }
+        };
+        
+        this.utterance.onerror = (event: any) => {
+          this.speaking = false;
+          if (this.onErrorCallback) {
+            this.onErrorCallback(new Error(`语音合成错误: ${event.name || '未知错误'}`));
+          }
+        };
+        
+        this.synthesis.speak(this.utterance);
+      }
+    } else {
+      throw new Error('浏览器不支持SpeechSynthesisUtterance');
+    }
+  }
+
+  async cancel(): Promise<void> {
+    if (!this.synthesis) return;
+    
+    this.synthesis.cancel();
+    this.speaking = false;
+  }
+
+  async pause(): Promise<void> {
+    if (!this.synthesis) return;
+    
+    this.synthesis.pause();
+  }
+
+  async resume(): Promise<void> {
+    if (!this.synthesis) return;
+    
+    this.synthesis.resume();
+  }
+
+  isSpeaking(): boolean {
+    return this.speaking;
+  }
+
+  async getVoices(): Promise<any[]> {
+    if (!this.synthesis) return [];
+    
+    return this.synthesis.getVoices();
+  }
+
+  setVoice(voice: any | string): void {
+    if (typeof voice === 'string') {
+      // 按名称查找声音
+      this.getVoices().then(voices => {
+        const matchedVoice = voices.find((v: any) => v.name === voice);
+        if (matchedVoice) {
+          this.voice = matchedVoice;
+        }
+      });
+    } else {
+      this.voice = voice;
+    }
+  }
+
+  setLanguage(language: string): void {
+    this.config.language = language;
+    
+    // 尝试重新加载匹配该语言的声音
+    this.getVoices().then(voices => {
+      const matchedVoice = voices.find((v: any) => v.lang.startsWith(language) && v.localService) ||
+                          voices.find((v: any) => v.lang.startsWith(language));
+      if (matchedVoice) {
+        this.voice = matchedVoice;
+      }
+    });
+  }
+
+  setRate(rate: number): void {
+    this.config.rate = rate;
+  }
+
+  setPitch(pitch: number): void {
+    this.config.pitch = pitch;
+  }
+
+  setVolume(volume: number): void {
+    this.config.volume = volume;
+  }
+
+  onStart(callback: () => void): void {
+    this.onStartCallback = callback;
+  }
+
+  onEnd(callback: () => void): void {
+    this.onEndCallback = callback;
+  }
+
+  onError(callback: (error: Error) => void): void {
+    this.onErrorCallback = callback;
+  }
+}
+
+// OpenAI TTS API 实现
+export class OpenAITTS implements SpeechSynthesizer {
+  private apiKey: string;
+  private language: string;
+  private voice: string;
+  private rate: number;
+  private pitch: number;
+  private volume: number;
+  private audio: HTMLAudioElement | null = null;
+  private speaking = false;
+  private onStartCallback: (() => void) | null = null;
+  private onEndCallback: (() => void) | null = null;
+  private onErrorCallback: ((error: Error) => void) | null = null;
+
+  constructor(apiKey: string, config: SpeechSynthesizerConfig = {}) {
+    this.apiKey = apiKey;
+    this.language = config.language || 'zh';
+    this.voice = config.voice || 'alloy'; // OpenAI声音: alloy, echo, fable, onyx, nova, shimmer
+    this.rate = config.rate || 1.0;
+    this.pitch = config.pitch || 1.0;
+    this.volume = config.volume || 1.0;
+  }
+
+  async speak(text: string): Promise<void> {
+    try {
+      // 取消当前语音
+      if (this.audio) {
+        this.audio.pause();
+        this.audio = null;
+      }
+
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'tts-1',
+          input: text,
+          voice: this.voice,
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenAI TTS API error: ${response.status} ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      this.audio = new Audio(url);
+      this.audio.volume = this.volume;
+      
+      // 设置播放速率 (部分浏览器支持)
+      if ('playbackRate' in this.audio) {
+        this.audio.playbackRate = this.rate;
+      }
+      
+      this.audio.onplay = () => {
+        this.speaking = true;
+        if (this.onStartCallback) {
+          this.onStartCallback();
+        }
+      };
+      
+      this.audio.onended = () => {
+        this.speaking = false;
+        URL.revokeObjectURL(url);
+        if (this.onEndCallback) {
+          this.onEndCallback();
+        }
+      };
+      
+      this.audio.onerror = (e) => {
+        this.speaking = false;
+        URL.revokeObjectURL(url);
+        if (this.onErrorCallback) {
+          this.onErrorCallback(new Error('语音播放错误'));
+        }
+      };
+      
+      this.audio.play();
+    } catch (error) {
+      console.error('OpenAI TTS错误:', error);
+      if (this.onErrorCallback) {
+        this.onErrorCallback(error instanceof Error ? error : new Error(String(error)));
+      }
+    }
+  }
+
+  async cancel(): Promise<void> {
+    if (this.audio) {
+      this.audio.pause();
+      this.audio = null;
+      this.speaking = false;
+    }
+  }
+
+  async pause(): Promise<void> {
+    if (this.audio) {
+      this.audio.pause();
+    }
+  }
+
+  async resume(): Promise<void> {
+    if (this.audio) {
+      this.audio.play();
+    }
+  }
+
+  isSpeaking(): boolean {
+    return this.speaking;
+  }
+
+  async getVoices(): Promise<SpeechSynthesisVoice[]> {
+    // OpenAI有固定的声音选项
+    return [
+      { default: this.voice === 'alloy', lang: this.language, localService: false, name: 'alloy', voiceURI: 'alloy' },
+      { default: this.voice === 'echo', lang: this.language, localService: false, name: 'echo', voiceURI: 'echo' },
+      { default: this.voice === 'fable', lang: this.language, localService: false, name: 'fable', voiceURI: 'fable' },
+      { default: this.voice === 'onyx', lang: this.language, localService: false, name: 'onyx', voiceURI: 'onyx' },
+      { default: this.voice === 'nova', lang: this.language, localService: false, name: 'nova', voiceURI: 'nova' },
+      { default: this.voice === 'shimmer', lang: this.language, localService: false, name: 'shimmer', voiceURI: 'shimmer' },
+    ];
+  }
+
+  setVoice(voice: SpeechSynthesisVoice | string): void {
+    if (typeof voice === 'string') {
+      this.voice = voice;
+    } else {
+      this.voice = voice.name;
+    }
+  }
+
+  setLanguage(language: string): void {
+    this.language = language;
+  }
+
+  setRate(rate: number): void {
+    this.rate = rate;
+  }
+
+  setPitch(pitch: number): void {
+    this.pitch = pitch;
+  }
+
+  setVolume(volume: number): void {
+    this.volume = volume;
+    if (this.audio) {
+      this.audio.volume = volume;
+    }
+  }
+
+  onStart(callback: () => void): void {
+    this.onStartCallback = callback;
+  }
+
+  onEnd(callback: () => void): void {
+    this.onEndCallback = callback;
+  }
+
+  onError(callback: (error: Error) => void): void {
+    this.onErrorCallback = callback;
+  }
+}
+
+// 语音合成工厂函数
+export function createSpeechSynthesizer(
+  type: 'web' | 'openai' = 'web',
+  config: SpeechSynthesizerConfig = {}
+): SpeechSynthesizer {
+  switch (type) {
+    case 'openai':
+      if (!config.apiKey) {
+        throw new Error('OpenAI TTS需要提供API Key');
+      }
+      return new OpenAITTS(config.apiKey, config);
+    case 'web':
+    default:
+      return new WebSpeechSynthesizer(config);
   }
 } 

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SpeechInput } from "@/components/interview/SpeechInput";
+import { SpeechOutput } from "@/components/SpeechOutputFixed";
 
 type Message = {
   role: "user" | "assistant" | "system";
@@ -56,7 +57,8 @@ async function handleStreamResponse(
   response: Response,
   initialMessages: Message[],
   updateMessagesFn: (messages: Message[]) => void,
-  setErrorFn: (error: string) => void
+  setErrorFn: (error: string) => void,
+  setLastMessageFn?: (text: string) => void
 ) {
   if (!response.ok) {
     const errorText = await response.text();
@@ -112,6 +114,11 @@ async function handleStreamResponse(
       content: text 
     };
     updateMessagesFn([...initialMessages, assistantMessage]);
+    
+    // 如果提供了设置最后消息的函数，更新最后的AI回复
+    if (setLastMessageFn && text) {
+      setLastMessageFn(text);
+    }
   } catch (error) {
     console.error("处理流式响应时出错:", error);
     setErrorFn(`处理响应时出错: ${error instanceof Error ? error.message : String(error)}`);
@@ -140,6 +147,8 @@ export default function InterviewChat() {
   
   // 自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const [lastAssistantMessage, setLastAssistantMessage] = useState<string>("");
   
   // 开始面试
   const startInterview = async () => {
@@ -190,7 +199,8 @@ export default function InterviewChat() {
         response,
         initialMessages,
         (newMessages) => setMessages(newMessages),
-        (errorMsg) => setError(errorMsg)
+        (errorMsg) => setError(errorMsg),
+        (text) => setLastAssistantMessage(text)
       );
       
       setIsStarted(true);
@@ -239,7 +249,8 @@ export default function InterviewChat() {
         response,
         newMessages,
         (newMessages) => setMessages(newMessages),
-        (errorMsg) => setError(errorMsg)
+        (errorMsg) => setError(errorMsg),
+        (text) => setLastAssistantMessage(text)
       );
     } catch (error) {
       console.error("发送消息时出错:", error);
@@ -307,6 +318,7 @@ export default function InterviewChat() {
     setShowFeedback(false);
     setFeedback("");
     setError(null);
+    setLastAssistantMessage("");
   };
   
   // 自动滚动到底部
@@ -338,6 +350,60 @@ export default function InterviewChat() {
           发送
         </Button>
       </form>
+    );
+  };
+  
+  // 渲染消息气泡
+  const renderMessage = (message: Message, index: number) => {
+    const isAssistant = message.role === "assistant";
+    
+    return (
+      <div
+        key={index}
+        className={cn(
+          "flex",
+          isAssistant ? "justify-start" : "justify-end"
+        )}
+      >
+        <div className="flex items-start max-w-[80%] space-x-2">
+          {isAssistant && (
+            <Avatar className="mt-1">
+              <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                签证官
+              </div>
+            </Avatar>
+          )}
+          <div
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm group relative",
+              isAssistant
+                ? "bg-muted text-foreground"
+                : "bg-primary text-primary-foreground"
+            )}
+          >
+            {message.content}
+            
+            {isAssistant && (
+              <div className="opacity-0 group-hover:opacity-100 absolute -right-10 top-1/2 transform -translate-y-1/2 transition-opacity">
+                <SpeechOutput 
+                  text={message.content}
+                  autoplay={message.content === lastAssistantMessage}
+                  useOpenAI={true}
+                  voice="nova" // 使用nova声音，适合中文发音的女性声音
+                  language="zh"
+                />
+              </div>
+            )}
+          </div>
+          {message.role === "user" && (
+            <Avatar className="mt-1">
+              <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center font-semibold">
+                您
+              </div>
+            </Avatar>
+          )}
+        </div>
+      </div>
     );
   };
   
@@ -431,42 +497,9 @@ export default function InterviewChat() {
       
       {/* 聊天区 */}
       <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-        {messages.filter(msg => msg.role !== "system").map((message, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex",
-              message.role === "assistant" ? "justify-start" : "justify-end"
-            )}
-          >
-            <div className="flex items-start max-w-[80%] space-x-2">
-              {message.role === "assistant" && (
-                <Avatar className="mt-1">
-                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-                    签证官
-                  </div>
-                </Avatar>
-              )}
-              <div
-                className={cn(
-                  "rounded-lg px-4 py-2 text-sm",
-                  message.role === "assistant"
-                    ? "bg-muted text-foreground"
-                    : "bg-primary text-primary-foreground"
-                )}
-              >
-                {message.content}
-              </div>
-              {message.role === "user" && (
-                <Avatar className="mt-1">
-                  <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center font-semibold">
-                    您
-                  </div>
-                </Avatar>
-              )}
-            </div>
-          </div>
-        ))}
+        {messages.filter(msg => msg.role !== "system").map((message, i) => 
+          renderMessage(message, i)
+        )}
         <div ref={messagesEndRef} />
       </div>
       
