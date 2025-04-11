@@ -223,18 +223,26 @@ export class OpenAIRecognizer implements SpeechRecognizer {
   private errorCallback: ((error: Error) => void) | null = null;
   private apiKey: string;
   private language: string;
+  private recognitionTimer: NodeJS.Timeout | null = null;
+  private stream: MediaStream | null = null;
+  private userStopped = false;
 
   constructor(apiKey: string, language: string = 'zh') {
     this.apiKey = apiKey;
-    this.language = language;
+    // 确保语言代码符合ISO-639-1格式（只保留主语言代码）
+    this.language = language.split('-')[0].toLowerCase();
   }
 
   async start(): Promise<void> {
     if (this.listening) return;
+    
+    // 重置用户停止标志
+    this.userStopped = false;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.mediaRecorder = new MediaRecorder(stream);
+      // 获取麦克风权限
+      this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(this.stream);
       this.audioChunks = [];
 
       this.mediaRecorder.ondataavailable = (event) => {
@@ -246,61 +254,56 @@ export class OpenAIRecognizer implements SpeechRecognizer {
       this.mediaRecorder.onstop = async () => {
         if (this.audioChunks.length > 0) {
           const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          await this.processAudio(audioBlob);
+          
+          // 只有当用户明确停止时才处理音频，避免自动停止的重复处理
+          if (this.userStopped) {
+            await this.processAudio(audioBlob);
+            this.audioChunks = []; // 清空音频块
+          }
+          
+          // 如果不是用户主动停止，并且仍处于监听状态，则重新开始录音
+          if (!this.userStopped && this.listening) {
+            this.restartRecording();
+          }
         }
       };
 
       this.mediaRecorder.start(1000); // 每秒收集一次数据
       this.listening = true;
 
-      // 定期发送音频进行识别
+      // 设置自动停止和重新开始录音的计时器 (10秒)
       this.startPeriodicRecognition();
     } catch (error) {
-      console.error('错误启动OpenAI语音识别:', error);
+      console.error('启动OpenAI语音识别时出错:', error);
       if (this.errorCallback) {
         this.errorCallback(error instanceof Error ? error : new Error(String(error)));
       }
     }
   }
 
-  private startPeriodicRecognition() {
-    // 每5秒处理一次收集的音频
-    const intervalId = setInterval(async () => {
-      if (!this.listening || !this.mediaRecorder) {
-        clearInterval(intervalId);
-        return;
-      }
-
-      if (this.audioChunks.length > 0) {
-        // 暂停录制，处理当前音频，然后继续
-        this.mediaRecorder.pause();
-        const currentChunks = [...this.audioChunks];
-        this.audioChunks = [];
-        
-        const audioBlob = new Blob(currentChunks, { type: 'audio/webm' });
-        await this.processAudio(audioBlob);
-        
-        if (this.listening && this.mediaRecorder.state !== 'recording') {
-          this.mediaRecorder.resume();
-        }
-      }
-    }, 5000);
-  }
-
   async stop(): Promise<void> {
-    if (!this.listening || !this.mediaRecorder) return;
+    this.userStopped = true; // 标记为用户主动停止
+    
+    if (!this.listening) return;
+    
+    // 清除任何活动的计时器
+    this.clearRecognitionTimer();
 
-    this.listening = false;
     try {
-      this.mediaRecorder.stop();
-      // 停止所有轨道
-      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      this.mediaRecorder = null;
-    } catch (error) {
-      console.error('错误停止OpenAI语音识别:', error);
-      if (this.errorCallback) {
-        this.errorCallback(error instanceof Error ? error : new Error(String(error)));
+      if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+        this.mediaRecorder.stop();
       }
+
+      // 关闭并释放媒体流
+      if (this.stream) {
+        this.stream.getTracks().forEach(track => track.stop());
+        this.stream = null;
+      }
+
+      this.listening = false;
+    } catch (error) {
+      console.error('停止OpenAI语音识别时出错:', error);
+      throw error;
     }
   }
 
@@ -316,28 +319,173 @@ export class OpenAIRecognizer implements SpeechRecognizer {
     this.errorCallback = callback;
   }
 
+  private startPeriodicRecognition(): void {
+    // 清除任何现有的计时器
+    this.clearRecognitionTimer();
+    
+    // 创建新的计时器，每10秒自动停止并重新开始录音
+    this.recognitionTimer = setTimeout(() => {
+      if (this.listening && this.mediaRecorder) {
+        if (this.mediaRecorder.state !== 'inactive') {
+          console.log('自动停止录音以进行处理...');
+          this.mediaRecorder.stop();
+          // 在onstop事件中处理重新启动
+        }
+      }
+    }, 10000);
+  }
+
+  private clearRecognitionTimer(): void {
+    if (this.recognitionTimer) {
+      clearTimeout(this.recognitionTimer);
+      this.recognitionTimer = null;
+    }
+  }
+
+  private restartRecording(): void {
+    try {
+      // 确保MediaRecorder已停止
+      if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+        return; // 如果仍在录制，不要重新启动
+      }
+      
+      console.log('重新启动录音...');
+      
+      // 使用现有的媒体流重新创建MediaRecorder
+      if (this.stream) {
+        this.mediaRecorder = new MediaRecorder(this.stream);
+        this.audioChunks = []; // 清空音频块
+        
+        this.mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            this.audioChunks.push(event.data);
+          }
+        };
+        
+        this.mediaRecorder.onstop = async () => {
+          if (this.audioChunks.length > 0) {
+            const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+            
+            // 只有当用户明确停止时才处理音频
+            if (this.userStopped) {
+              await this.processAudio(audioBlob);
+              this.audioChunks = []; // 清空音频块
+            }
+            
+            // 如果不是用户主动停止，并且仍处于监听状态，则重新开始录音
+            if (!this.userStopped && this.listening) {
+              this.restartRecording();
+            }
+          }
+        };
+        
+        // 开始新的录制
+        this.mediaRecorder.start(1000);
+        
+        // 重新设置计时器
+        this.startPeriodicRecognition();
+      }
+    } catch (error) {
+      console.error('重新启动录音时出错:', error);
+      if (this.errorCallback) {
+        this.errorCallback(error instanceof Error ? error : new Error(String(error)));
+      }
+    }
+  }
+
   private async processAudio(audioBlob: Blob): Promise<void> {
     try {
+      console.log(`处理音频数据，大小: ${audioBlob.size} 字节, 类型: ${audioBlob.type}`);
+      if (audioBlob.size < 1000) {
+        console.log("音频数据太小，跳过处理");
+        return; // 如果音频太小，可能没有有用的内容
+      }
+      
+      // 确保我们有正确的MIME类型
+      let processedBlob = audioBlob;
+      if (!audioBlob.type.includes('audio/')) {
+        console.log("修正音频MIME类型为audio/webm");
+        processedBlob = new Blob([await audioBlob.arrayBuffer()], { type: 'audio/webm' });
+      }
+      
       const formData = new FormData();
-      formData.append('file', audioBlob, 'recording.webm');
-      formData.append('model', 'whisper-1');
-      formData.append('language', this.language);
+      formData.append('file', processedBlob, 'recording.webm');
+      formData.append('language', this.language); // 已经确保是ISO-639-1格式
+      formData.append('model', 'whisper-1'); // 确保包含model参数
 
-      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      // 使用自定义API端点而不是直接调用OpenAI API
+      let response;
+      let error = null;
+      
+      // 先尝试使用自定义API
+      try {
+        console.log("尝试使用服务器端API进行语音识别...");
+        response = await fetch('/api/speech-recognize', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          error = new Error(`服务器API错误: ${response.status} ${response.statusText}${errorData ? ` - ${errorData.error || ''}` : ''}`);
+          console.error("服务器API错误:", error);
+          // 不立即抛出，继续尝试直接API
+        }
+      } catch (apiError) {
+        console.error('无法连接到服务器API:', apiError);
+        error = apiError;
+        // 不立即抛出，继续尝试直接API
+      }
+      
+      // 如果服务器API成功，处理结果
+      if (response && response.ok) {
+        const data = await response.json();
+        if (data.text && this.resultCallback) {
+          const transcript = data.text.trim();
+          if (transcript) {
+            console.log(`获取到语音识别结果: "${transcript}"`);
+            this.resultCallback(transcript, true);
+            return; // 成功返回
+          } else {
+            console.log("收到空的识别结果");
+          }
+        }
+      }
+      
+      // 如果服务器API失败，尝试直接调用OpenAI API
+      if (!this.apiKey) {
+        // 如果没有API密钥，抛出之前保存的错误或新错误
+        throw error || new Error('未提供OpenAI API密钥，无法进行语音识别');
+      }
+      
+      console.log("尝试直接调用OpenAI API...");
+      const directFormData = new FormData();
+      directFormData.append('file', processedBlob, 'recording.webm');
+      directFormData.append('model', 'whisper-1'); // 必须提供model参数
+      directFormData.append('language', this.language);
+      
+      const directResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`
         },
-        body: formData
+        body: directFormData
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+      if (!directResponse.ok) {
+        const errorData = await directResponse.json().catch(() => ({}));
+        throw new Error(`OpenAI API错误: ${directResponse.status} ${directResponse.statusText}${errorData.error ? ` - ${errorData.error.message || ''}` : ''}`);
       }
 
-      const data = await response.json();
+      const data = await directResponse.json();
       if (data.text && this.resultCallback) {
-        this.resultCallback(data.text, true);
+        const transcript = data.text.trim();
+        if (transcript) {
+          console.log(`获取到语音识别结果: "${transcript}"`);
+          this.resultCallback(transcript, true);
+        } else {
+          console.log("收到空的识别结果");
+        }
       }
     } catch (error) {
       console.error('处理音频时出错:', error);

@@ -4,11 +4,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { createSpeechRecognizer, SpeechRecognizer } from "@/aisdk/speech";
 import { Mic, MicOff } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // 定义组件属性
 interface SpeechInputProps {
   onResult: (text: string) => void;
-  recognizerType?: 'web' | 'openai' | 'google';
+  recognizerType?: 'web' | 'openai';
   apiKey?: string;
   language?: string;
   disabled?: boolean;
@@ -16,7 +17,7 @@ interface SpeechInputProps {
 
 export function SpeechInput({
   onResult,
-  recognizerType = 'web',
+  recognizerType = 'openai', // 默认使用OpenAI
   apiKey,
   language = 'zh-CN',
   disabled = false
@@ -30,7 +31,7 @@ export function SpeechInput({
   useEffect(() => {
     try {
       const config = {
-        apiKey,
+        apiKey: apiKey || process.env.NEXT_PUBLIC_OPENAI_API_KEY,
         language
       };
 
@@ -42,6 +43,11 @@ export function SpeechInput({
         if (isFinal) {
           onResult(text);
           setInterimText("");
+          
+          // 使用OpenAI时，收到结果后不停止录音，让用户可以继续说话
+          if (recognizerType === 'web') {
+            setIsListening(false);
+          }
         } else {
           setInterimText(text);
         }
@@ -90,30 +96,42 @@ export function SpeechInput({
 
   // 渲染组件
   return (
-    <div className="relative">
-      <Button
-        type="button"
-        disabled={disabled || !recognizer}
-        onClick={toggleListening}
-        variant={isListening ? "destructive" : "outline"}
-        size="icon"
-        className="rounded-full h-10 w-10"
-        title={isListening ? "停止语音输入" : "开始语音输入"}
-      >
-        {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-      </Button>
-      
-      {interimText && (
-        <div className="absolute bottom-full mb-2 p-2 bg-slate-800 text-white rounded-md text-sm min-w-48 max-w-96">
-          {interimText}
-        </div>
-      )}
-      
-      {error && (
-        <div className="absolute bottom-full mb-2 p-2 bg-red-600 text-white rounded-md text-sm min-w-48 max-w-96">
-          错误: {error}
-        </div>
-      )}
-    </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="relative">
+            <Button
+              type="button"
+              disabled={disabled || !recognizer}
+              onClick={toggleListening}
+              variant={isListening ? "destructive" : "outline"}
+              size="icon"
+              className="rounded-full h-10 w-10"
+              title={isListening ? "停止语音输入" : "开始语音输入"}
+            >
+              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+            </Button>
+            
+            {interimText && (
+              <div className="absolute bottom-full mb-2 p-2 bg-slate-800 text-white rounded-md text-sm min-w-48 max-w-96">
+                {interimText}
+              </div>
+            )}
+            
+            {error && (
+              <div className="absolute bottom-full mb-2 p-2 bg-red-600 text-white rounded-md text-sm min-w-48 max-w-96">
+                错误: {error}
+              </div>
+            )}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{isListening ? "点击停止语音输入" : "点击开始语音输入"}</p>
+          {isListening && recognizerType === 'openai' && (
+            <p className="text-xs mt-1">持续收听中 - 说完后点击停止</p>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 } 

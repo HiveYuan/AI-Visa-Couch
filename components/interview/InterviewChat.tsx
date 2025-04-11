@@ -345,6 +345,7 @@ export default function InterviewChat() {
         <SpeechInput 
           onResult={handleSpeechResult}
           disabled={isLoading || !isStarted}
+          recognizerType="openai"
         />
         <Button type="submit" disabled={isLoading || !isStarted || !input.trim()}>
           发送
