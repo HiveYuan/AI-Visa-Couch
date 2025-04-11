@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { SpeechInput } from "@/components/interview/SpeechInput";
 
 type Message = {
   role: "user" | "assistant" | "system";
@@ -248,6 +249,11 @@ export default function InterviewChat() {
     }
   };
   
+  // 处理语音输入结果
+  const handleSpeechResult = (text: string) => {
+    setInput(text);
+  };
+  
   // 获取面试反馈
   const getFeedback = async () => {
     if (messages.length < 3) return; // 需要有足够的对话内容才能生成反馈
@@ -313,15 +319,35 @@ export default function InterviewChat() {
     setShowFeedback(false);
   };
   
+  // 渲染聊天表单
+  const renderChatForm = () => {
+    return (
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t pt-4">
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="请输入您的回答..."
+          disabled={isLoading || !isStarted}
+          className="flex-1"
+        />
+        <SpeechInput 
+          onResult={handleSpeechResult}
+          disabled={isLoading || !isStarted}
+        />
+        <Button type="submit" disabled={isLoading || !isStarted || !input.trim()}>
+          发送
+        </Button>
+      </form>
+    );
+  };
+  
   return (
-    <div className="flex flex-col h-[600px]">
-      {!isStarted ? (
-        <div className="flex-1 flex flex-col justify-center items-center p-6 space-y-6">
-          <h2 className="text-2xl font-bold">美国签证面试模拟训练</h2>
-          <p className="text-center text-muted-foreground">
-            与AI签证官进行真实的面试对话，获取即时反馈和改进建议
-          </p>
-          <div className="w-full max-w-md space-y-4">
+    <div className="flex flex-col h-[calc(100vh-16rem)]">
+      {/* 面试配置选择区 */}
+      {!isStarted && (
+        <div className="mb-4 p-4 bg-muted/50 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">面试设置</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">签证类型</label>
               <Select value={visaType} onValueChange={setVisaType}>
@@ -330,6 +356,22 @@ export default function InterviewChat() {
                 </SelectTrigger>
                 <SelectContent>
                   {VISA_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">面试类型</label>
+              <Select value={interviewType} onValueChange={setInterviewType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择面试类型" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INTERVIEW_TYPES.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
                     </SelectItem>
@@ -355,22 +397,6 @@ export default function InterviewChat() {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">面试类型</label>
-              <Select value={interviewType} onValueChange={setInterviewType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择面试类型" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INTERVIEW_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
               <label className="text-sm font-medium">难度级别</label>
               <Select value={difficulty} onValueChange={setDifficulty}>
                 <SelectTrigger>
@@ -385,131 +411,121 @@ export default function InterviewChat() {
                 </SelectContent>
               </Select>
             </div>
-            
-            <Button 
-              className="w-full" 
-              onClick={startInterview} 
-              disabled={isLoading}
-            >
-              {isLoading ? "准备中..." : "开始面试模拟"}
-            </Button>
-            
-            {error && (
-              <div className="p-3 text-sm text-white bg-red-500 rounded-md">
-                {error}
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="bg-muted p-3 flex justify-between items-center border-b">
-            <div>
-              <span className="font-medium">{visaType}</span>
-              <span className="text-xs ml-2 text-muted-foreground">目的: {travelPurpose} | 难度: {difficulty}</span>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={getFeedback}
-                disabled={isFeedbackLoading || messages.length < 3}
-              >
-                {isFeedbackLoading ? "分析中..." : "获取反馈"}
-              </Button>
-              <Button variant="outline" size="sm" onClick={resetInterview}>
-                重新开始
-              </Button>
-            </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.filter(m => m.role !== "system").map((message, index) => (
+          <Button 
+            onClick={startInterview} 
+            disabled={isLoading} 
+            className="w-full mt-4"
+          >
+            {isLoading ? "初始化中..." : "开始面试"}
+          </Button>
+          
+          {error && (
+            <div className="mt-4 p-2 bg-red-50 border border-red-200 text-red-600 rounded">
+              {error}
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* 聊天区 */}
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+        {messages.filter(msg => msg.role !== "system").map((message, i) => (
+          <div
+            key={i}
+            className={cn(
+              "flex",
+              message.role === "assistant" ? "justify-start" : "justify-end"
+            )}
+          >
+            <div className="flex items-start max-w-[80%] space-x-2">
+              {message.role === "assistant" && (
+                <Avatar className="mt-1">
+                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                    签证官
+                  </div>
+                </Avatar>
+              )}
               <div
-                key={index}
                 className={cn(
-                  "flex",
-                  message.role === "user" ? "justify-end" : "justify-start"
+                  "rounded-lg px-4 py-2 text-sm",
+                  message.role === "assistant"
+                    ? "bg-muted text-foreground"
+                    : "bg-primary text-primary-foreground"
                 )}
               >
-                <div
-                  className={cn(
-                    "max-w-[80%] rounded-lg p-3",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  )}
-                >
-                  <div className="flex items-start gap-2">
-                    {message.role === "assistant" && (
-                      <Avatar className="h-8 w-8">
-                        <div className="h-full w-full flex items-center justify-center bg-primary text-primary-foreground text-xs font-bold">
-                          VO
-                        </div>
-                      </Avatar>
-                    )}
-                    <div className="flex-1 whitespace-pre-wrap">{message.content}</div>
+                {message.content}
+              </div>
+              {message.role === "user" && (
+                <Avatar className="mt-1">
+                  <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center font-semibold">
+                    您
                   </div>
-                </div>
-              </div>
-            ))}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] rounded-lg p-3 bg-muted">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <div className="h-full w-full flex items-center justify-center bg-primary text-primary-foreground text-xs font-bold">
-                        VO
-                      </div>
-                    </Avatar>
-                    <div>思考中...</div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {error && (
-              <div className="p-3 my-2 text-sm text-white bg-red-500 rounded-md">
-                {error}
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-          
-          <form onSubmit={handleSubmit} className="border-t p-4">
-            <div className="flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="输入你的回答..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button type="submit" disabled={isLoading || !input.trim()}>
-                发送
-              </Button>
+                </Avatar>
+              )}
             </div>
-          </form>
-        </>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+      
+      {/* 输入区域 */}
+      {isStarted && renderChatForm()}
+      
+      {/* 操作按钮 */}
+      {isStarted && (
+        <div className="flex justify-center gap-4 mt-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowFeedback(true)}
+            disabled={messages.length < 3 || isFeedbackLoading}
+          >
+            获取面试反馈
+          </Button>
+          <Button variant="outline" onClick={resetInterview}>
+            重新开始
+          </Button>
+        </div>
       )}
       
       {/* 反馈对话框 */}
-      <Dialog open={showFeedback} onOpenChange={closeFeedbackDialog}>
-        <DialogContent className="max-w-xl">
+      <Dialog open={showFeedback} onOpenChange={setShowFeedback}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>签证面试分析与反馈</DialogTitle>
+            <DialogTitle>面试表现反馈</DialogTitle>
             <DialogDescription>
-              基于本次模拟面试对话的AI评估结果和改进建议
+              以下是基于您当前面试对话的分析与建议
             </DialogDescription>
           </DialogHeader>
-          <div className="mt-4 p-4 bg-muted rounded-lg whitespace-pre-wrap">
-            {feedback}
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button variant="secondary" onClick={closeFeedbackDialog}>关闭</Button>
-          </div>
+          
+          {isFeedbackLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="ml-2">分析中...</span>
+            </div>
+          ) : feedback ? (
+            <div className="space-y-4 py-4">
+              <div className="prose dark:prose-invert max-w-none">
+                {feedback.split("\n").map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+              <Button 
+                onClick={closeFeedbackDialog} 
+                className="w-full"
+              >
+                关闭
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <Button onClick={getFeedback}>获取详细反馈</Button>
+              <p className="text-sm text-muted-foreground">
+                点击按钮获取基于当前对话的详细反馈和建议
+              </p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
