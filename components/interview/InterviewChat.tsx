@@ -14,30 +14,41 @@ type Message = {
 };
 
 type InterviewOptions = {
-  jobTitle: string;
-  jobLevel: string;
-  interviewStage: string;
+  visaType: string;
+  interviewType: string;
+  travelPurpose: string;
+  difficulty: string;
 };
 
-// 预设的职位选项
-const JOB_TITLES = [
-  "前端开发工程师",
-  "后端开发工程师",
-  "全栈开发工程师",
-  "iOS开发工程师",
-  "Android开发工程师",
-  "数据工程师",
-  "算法工程师",
-  "产品经理",
-  "UI设计师",
-  "UX设计师",
-  "测试工程师",
-  "DevOps工程师",
+// 预设的签证类型选项
+const VISA_TYPES = [
+  "B1/B2 (商务/旅游签证)",
+  "F1 (学生签证)",
+  "J1 (交流访问学者)",
+  "H1B (工作签证)",
+  "L1 (跨国公司内部调动)",
+  "O1 (特殊人才签证)",
 ];
 
-const JOB_LEVELS = ["初级", "中级", "高级", "资深", "专家"];
+const INTERVIEW_TYPES = [
+  "标准面试",
+  "严格审查",
+  "快速面试",
+  "深入询问",
+];
 
-const INTERVIEW_STAGES = ["技术面试", "HR面试", "行为面试", "系统设计面试"];
+const TRAVEL_PURPOSES = [
+  "旅游",
+  "探亲",
+  "商务",
+  "学习",
+  "学术交流",
+  "短期工作",
+  "会议",
+  "医疗",
+];
+
+const DIFFICULTY_LEVELS = ["简单", "中等", "困难", "极具挑战"];
 
 // 处理流式响应的函数
 async function handleStreamResponse(
@@ -113,9 +124,10 @@ export default function InterviewChat() {
   const [error, setError] = useState<string | null>(null);
   
   // 面试配置
-  const [jobTitle, setJobTitle] = useState(JOB_TITLES[0]);
-  const [jobLevel, setJobLevel] = useState(JOB_LEVELS[1]);
-  const [interviewStage, setInterviewStage] = useState(INTERVIEW_STAGES[0]);
+  const [visaType, setVisaType] = useState(VISA_TYPES[0]);
+  const [interviewType, setInterviewType] = useState(INTERVIEW_TYPES[0]);
+  const [travelPurpose, setTravelPurpose] = useState(TRAVEL_PURPOSES[0]);
+  const [difficulty, setDifficulty] = useState(DIFFICULTY_LEVELS[1]);
   
   // 是否已开始面试
   const [isStarted, setIsStarted] = useState(false);
@@ -133,22 +145,28 @@ export default function InterviewChat() {
     setIsLoading(true);
     setError(null);
     
+    // 提取实际签证类型（去掉描述部分）
+    const actualVisaType = visaType.split(" ")[0];
+    
     const options: InterviewOptions = {
-      jobTitle,
-      jobLevel,
-      interviewStage,
+      visaType: actualVisaType,
+      interviewType,
+      travelPurpose,
+      difficulty,
     };
     
     // 系统提示消息（不显示给用户）
     const systemMessage: Message = {
       role: "system",
-      content: `你是一位专业的${jobTitle}${jobLevel}岗位${interviewStage}面试官。
-请用中文与候选人进行面试对话。
-你的目标是评估候选人的技能、经验和文化契合度。
-面试过程中，请提出有针对性的问题，根据候选人的回答进行跟进提问。
-保持专业、友好的态度，给予真实的反馈。
-每次回复控制在2-3句话以内，保持对话的流畅性。
-在面试结束时，你将对候选人的表现进行简要评估。`,
+      content: `你是一位美国驻华使领馆的签证官，正在进行${actualVisaType}签证的${interviewType}。
+申请人的旅行目的是${travelPurpose}。
+请用中文与申请人进行面试对话，难度设定为${difficulty}。
+你的目标是评估申请人申请签证的真实意图、访美计划的合理性、在美停留时间的合理性，以及申请人与中国的联系纽带等。
+面试过程中，请提出符合真实签证面试的问题，根据申请人的回答进行跟进提问。
+保持专业、严肃但不失礼貌的态度。
+每次回复控制在1-2个问题以内，保持对话的流畅性。
+面试特点：问题简短直接，通常不做过多解释，快速切换话题是常见的。
+在面试结束时，你将对申请人的表现进行简要评估，并给出是否可能获得签证的分析。`,
     };
     
     // 设置初始消息
@@ -197,6 +215,8 @@ export default function InterviewChat() {
     setError(null);
     
     try {
+      const actualVisaType = visaType.split(" ")[0];
+      
       // 发送对话请求
       const response = await fetch("/api/interview/chat", {
         method: "POST",
@@ -206,9 +226,10 @@ export default function InterviewChat() {
         body: JSON.stringify({
           messages: newMessages,
           options: {
-            jobTitle,
-            jobLevel,
-            interviewStage,
+            visaType: actualVisaType,
+            interviewType,
+            travelPurpose,
+            difficulty,
           },
         }),
       });
@@ -235,6 +256,8 @@ export default function InterviewChat() {
     setError(null);
     
     try {
+      const actualVisaType = visaType.split(" ")[0];
+      
       const response = await fetch("/api/interview/feedback", {
         method: "POST",
         headers: {
@@ -243,9 +266,10 @@ export default function InterviewChat() {
         body: JSON.stringify({
           messages,
           options: {
-            jobTitle,
-            jobLevel,
-            interviewStage,
+            visaType: actualVisaType,
+            interviewType,
+            travelPurpose,
+            difficulty,
           },
         }),
       });
@@ -293,18 +317,21 @@ export default function InterviewChat() {
     <div className="flex flex-col h-[600px]">
       {!isStarted ? (
         <div className="flex-1 flex flex-col justify-center items-center p-6 space-y-6">
-          <h2 className="text-2xl font-bold">开始一场AI模拟面试</h2>
+          <h2 className="text-2xl font-bold">美国签证面试模拟训练</h2>
+          <p className="text-center text-muted-foreground">
+            与AI签证官进行真实的面试对话，获取即时反馈和改进建议
+          </p>
           <div className="w-full max-w-md space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">选择职位</label>
-              <Select value={jobTitle} onValueChange={setJobTitle}>
+              <label className="text-sm font-medium">签证类型</label>
+              <Select value={visaType} onValueChange={setVisaType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="选择职位" />
+                  <SelectValue placeholder="选择签证类型" />
                 </SelectTrigger>
                 <SelectContent>
-                  {JOB_TITLES.map((title) => (
-                    <SelectItem key={title} value={title}>
-                      {title}
+                  {VISA_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -312,31 +339,47 @@ export default function InterviewChat() {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">职位级别</label>
-              <Select value={jobLevel} onValueChange={setJobLevel}>
+              <label className="text-sm font-medium">旅行目的</label>
+              <Select value={travelPurpose} onValueChange={setTravelPurpose}>
                 <SelectTrigger>
-                  <SelectValue placeholder="选择级别" />
+                  <SelectValue placeholder="选择旅行目的" />
                 </SelectTrigger>
                 <SelectContent>
-                  {JOB_LEVELS.map((level) => (
+                  {TRAVEL_PURPOSES.map((purpose) => (
+                    <SelectItem key={purpose} value={purpose}>
+                      {purpose}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">面试类型</label>
+              <Select value={interviewType} onValueChange={setInterviewType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择面试类型" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INTERVIEW_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">难度级别</label>
+              <Select value={difficulty} onValueChange={setDifficulty}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择难度级别" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIFFICULTY_LEVELS.map((level) => (
                     <SelectItem key={level} value={level}>
                       {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">面试环节</label>
-              <Select value={interviewStage} onValueChange={setInterviewStage}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择面试环节" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INTERVIEW_STAGES.map((stage) => (
-                    <SelectItem key={stage} value={stage}>
-                      {stage}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -348,7 +391,7 @@ export default function InterviewChat() {
               onClick={startInterview} 
               disabled={isLoading}
             >
-              {isLoading ? "准备中..." : "开始面试"}
+              {isLoading ? "准备中..." : "开始面试模拟"}
             </Button>
             
             {error && (
@@ -362,8 +405,8 @@ export default function InterviewChat() {
         <>
           <div className="bg-muted p-3 flex justify-between items-center border-b">
             <div>
-              <span className="font-medium">{jobTitle} {jobLevel}</span>
-              <span className="text-xs ml-2 text-muted-foreground">{interviewStage}</span>
+              <span className="font-medium">{visaType}</span>
+              <span className="text-xs ml-2 text-muted-foreground">目的: {travelPurpose} | 难度: {difficulty}</span>
             </div>
             <div className="flex gap-2">
               <Button 
@@ -372,7 +415,7 @@ export default function InterviewChat() {
                 onClick={getFeedback}
                 disabled={isFeedbackLoading || messages.length < 3}
               >
-                {isFeedbackLoading ? "生成中..." : "获取反馈"}
+                {isFeedbackLoading ? "分析中..." : "获取反馈"}
               </Button>
               <Button variant="outline" size="sm" onClick={resetInterview}>
                 重新开始
@@ -401,7 +444,7 @@ export default function InterviewChat() {
                     {message.role === "assistant" && (
                       <Avatar className="h-8 w-8">
                         <div className="h-full w-full flex items-center justify-center bg-primary text-primary-foreground text-xs font-bold">
-                          AI
+                          VO
                         </div>
                       </Avatar>
                     )}
@@ -417,7 +460,7 @@ export default function InterviewChat() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <div className="h-full w-full flex items-center justify-center bg-primary text-primary-foreground text-xs font-bold">
-                        AI
+                        VO
                       </div>
                     </Avatar>
                     <div>思考中...</div>
@@ -456,9 +499,9 @@ export default function InterviewChat() {
       <Dialog open={showFeedback} onOpenChange={closeFeedbackDialog}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>面试反馈</DialogTitle>
+            <DialogTitle>签证面试分析与反馈</DialogTitle>
             <DialogDescription>
-              基于这次面试对话的AI评估结果
+              基于本次模拟面试对话的AI评估结果和改进建议
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 p-4 bg-muted rounded-lg whitespace-pre-wrap">
