@@ -9,10 +9,10 @@ interface InterviewPanelProps {
   applicantProfile: any;
 }
 
-export default function InterviewPanel({ 
+const InterviewPanel: React.FC<InterviewPanelProps> = ({ 
   scenario, 
   applicantProfile 
-}: InterviewPanelProps) {
+}) => {
   const [showThoughts, setShowThoughts] = useState(false);
   const [feedbackText, setFeedbackText] = useState<string>("");
 
@@ -30,7 +30,7 @@ export default function InterviewPanel({
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full w-full">
       <div className="mb-4 text-center">
         <h2 className="text-2xl font-bold mb-2">
           {scenario === "Student" 
@@ -59,6 +59,8 @@ export default function InterviewPanel({
           <Button onClick={handleRequestFeedback}>获取反馈 | Get Feedback</Button>
         </div>
       </div>
-    </>
+    </div>
   );
-} 
+};
+
+export default InterviewPanel; 

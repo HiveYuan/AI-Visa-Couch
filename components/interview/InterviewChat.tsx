@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SpeechInput } from "@/components/interview/SpeechInput";
 import { SpeechOutput } from "@/components/SpeechOutputFixed";
+import { getInitialInterviewPrompt, getInitialReasoningPrompt } from "@/aisdk/interview/prompts";
+import { InterviewOptions } from "@/aisdk/interview/types";
 
 type Message = {
   role: "user" | "assistant" | "system";
@@ -20,13 +22,6 @@ type Message = {
     unclear: string[];
     nextSteps: string;
   };
-};
-
-type InterviewOptions = {
-  visaType: string;
-  interviewType: string;
-  travelPurpose: string;
-  difficulty: string;
 };
 
 // 预设的签证类型选项
@@ -217,18 +212,7 @@ export default function InterviewChat() {
     // 系统提示消息（不显示给用户）
     const systemMessage: Message = {
       role: "system",
-      content: `You are a visa officer at the U.S. Embassy in China, conducting a ${actualVisaType} visa ${interviewType.toLowerCase()}.
-The applicant's purpose of travel is ${travelPurpose.toLowerCase()}.
-Please conduct the interview in English with a difficulty level of ${difficulty.toLowerCase()}.
-Your goal is to assess the applicant's true intent, the reasonableness of their travel plans, the appropriate length of stay, and their ties to China.
-During the interview, ask questions that reflect a real visa interview and follow up based on the applicant's responses.
-Maintain a professional, serious but polite attitude.
-
-EXTREMELY IMPORTANT: Ask ONLY ONE QUESTION at a time. For your first question, just say a brief greeting and ask about their purpose of travel. For example: "Good morning. What is the purpose of your visit to the United States?"
-
-DO NOT ask multiple questions in a single response. This is critical for the flow of the interview.
-Interview characteristics: questions are brief and direct, typically without much explanation, and rapid topic changes are common.
-At the end of the interview, you will provide a brief assessment of the applicant's performance and an analysis of whether they are likely to receive a visa.`,
+      content: getInitialInterviewPrompt(options),
     };
     
     // 设置初始消息
@@ -238,7 +222,7 @@ At the end of the interview, you will provide a brief assessment of the applican
     try {
       // 使用生成思考和问题的方式处理第一个问题，而不是直接使用流式输出
       // 这样可以确保第一个问题不会一次性输出多个问题
-      const initialReasoning = "This is the start of the interview, I should first greet the applicant and then ask about their travel purpose. I need to maintain professionalism and politeness, just asking a simple and clear question. ";
+      const initialReasoning = getInitialReasoningPrompt();
       
       // 生成第一个问题
       const questionResponse = await fetch("/api/interview/next-question", {
