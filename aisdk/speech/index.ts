@@ -234,6 +234,7 @@ export class OpenAIRecognizer implements SpeechRecognizer {
   private userStopped = false;
   private apiKey: string;
   private processingAudio = false;
+  private lastResult: string | null = null;
 
   constructor(apiKey: string, language: string = 'zh') {
     this.apiKey = apiKey;
@@ -260,13 +261,33 @@ export class OpenAIRecognizer implements SpeechRecognizer {
       };
 
       this.mediaRecorder.onstop = async () => {
+        console.log("[OpenAIRecognizer] mediaRecorder.onstop 被触发");
+        console.log("[OpenAIRecognizer] audioChunks长度:", this.audioChunks.length);
+        console.log("[OpenAIRecognizer] userStopped:", this.userStopped);
+        
         if (this.audioChunks.length > 0) {
           const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+          console.log("[OpenAIRecognizer] 创建audioBlob, 大小:", audioBlob.size);
           
           // 用户停止录音时处理完整的音频内容
           if (this.userStopped) {
+            console.log("[OpenAIRecognizer] 用户已停止录音，处理完整内容");
+            this.processingAudio = true; // 先标记为正在处理，避免在stop方法中触发回调
             await this.processAudio(audioBlob);
             this.audioChunks = []; // 清空音频块
+            
+            // 关键修改：在这里确保调用stoppedCallback，而不只是依赖processAudio中的调用
+            if (this.stoppedCallback) {
+              console.log("[OpenAIRecognizer] mediaRecorder.onstop中触发stoppedCallback");
+              this.stoppedCallback();
+            }
+          }
+        } else {
+          console.log("[OpenAIRecognizer] audioChunks为空，不处理音频");
+          // 但如果没有数据需要处理，应该直接触发停止回调
+          if (this.userStopped && this.stoppedCallback) {
+            console.log("[OpenAIRecognizer] 没有音频数据，但用户已停止，直接触发回调");
+            this.stoppedCallback();
           }
         }
       };
@@ -292,14 +313,18 @@ export class OpenAIRecognizer implements SpeechRecognizer {
     if (!this.listening) return;
 
     try {
-      console.log('用户停止录音，准备处理完整录音内容...');
+      console.log('[OpenAIRecognizer] 用户停止录音，准备处理完整录音内容...');
+      console.log('[OpenAIRecognizer] mediaRecorder状态:', this.mediaRecorder ? this.mediaRecorder.state : 'null');
+      console.log('[OpenAIRecognizer] audioChunks长度:', this.audioChunks.length);
       
       if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+        console.log('[OpenAIRecognizer] 停止mediaRecorder');
         this.mediaRecorder.stop();
       }
 
       // 关闭并释放媒体流
       if (this.stream) {
+        console.log('[OpenAIRecognizer] 关闭媒体流轨道');
         this.stream.getTracks().forEach(track => track.stop());
         this.stream = null;
       }
@@ -308,11 +333,19 @@ export class OpenAIRecognizer implements SpeechRecognizer {
       
       // 如果当前没有处理音频，直接触发停止回调
       if (!this.processingAudio && this.stoppedCallback) {
-        console.log("语音识别完全停止，触发停止回调");
+        console.log("[OpenAIRecognizer] 语音识别完全停止，准备触发停止回调");
+        console.log("[OpenAIRecognizer] 识别结果是否为空:", this.lastResult ? "否" : "是");
+        console.log("[OpenAIRecognizer] 最后识别结果:", this.lastResult);
+        console.log("[OpenAIRecognizer] 触发stoppedCallback");
         this.stoppedCallback();
+        console.log("[OpenAIRecognizer] 停止回调已触发");
+      } else {
+        console.log("[OpenAIRecognizer] 当前正在处理音频或无停止回调:", 
+                   "processingAudio=", this.processingAudio, 
+                   "stoppedCallback=", !!this.stoppedCallback);
       }
     } catch (error) {
-      console.error('停止OpenAI语音识别时出错:', error);
+      console.error('[OpenAIRecognizer] 停止OpenAI语音识别时出错:', error);
       throw error;
     }
   }
@@ -322,14 +355,17 @@ export class OpenAIRecognizer implements SpeechRecognizer {
   }
 
   onResult(callback: (text: string, isFinal: boolean) => void): void {
+    console.log("[OpenAIRecognizer] 设置onResult回调");
     this.resultCallback = callback;
   }
 
   onError(callback: (error: Error) => void): void {
+    console.log("[OpenAIRecognizer] 设置onError回调");
     this.errorCallback = callback;
   }
 
   onStopped(callback: () => void): void {
+    console.log("[OpenAIRecognizer] 设置onStopped回调");
     this.stoppedCallback = callback;
   }
 
@@ -388,6 +424,7 @@ export class OpenAIRecognizer implements SpeechRecognizer {
           if (transcript) {
             console.log(`获取到语音识别结果: "${transcript}"`);
             this.resultCallback(transcript, true);
+            this.lastResult = transcript;
           } else {
             console.log("收到空的识别结果");
           }
@@ -424,6 +461,7 @@ export class OpenAIRecognizer implements SpeechRecognizer {
           if (transcript) {
             console.log(`获取到语音识别结果: "${transcript}"`);
             this.resultCallback(transcript, true);
+            this.lastResult = transcript;
           } else {
             console.log("收到空的识别结果");
           }
@@ -436,13 +474,12 @@ export class OpenAIRecognizer implements SpeechRecognizer {
       }
     } finally {
       // 标记处理完成
+      const wasProcessing = this.processingAudio;
       this.processingAudio = false;
       
-      // 如果是用户手动停止且设置了停止回调，触发回调
-      if (this.userStopped && this.stoppedCallback) {
-        console.log("语音识别完全停止，触发停止回调");
-        this.stoppedCallback();
-      }
+      // 我们已经在mediaRecorder.onstop中处理了stoppedCallback调用，这里不再需要触发
+      console.log("[OpenAIRecognizer] processAudio完成，processingAudio设置为false");
+      console.log("[OpenAIRecognizer] stoppedCallback应该已经在mediaRecorder.onstop中触发");
     }
   }
 }
@@ -612,12 +649,14 @@ export function createSpeechRecognizer(
   type: 'web' | 'openai' | 'google' = 'web',
   config: SpeechRecognizerConfig = {}
 ): SpeechRecognizer {
+  console.log(`[SpeechSDK] 创建语音识别器: type=${type}`);
   switch (type) {
     case 'openai':
       if (!config.apiKey) {
-        throw new Error('OpenAI需要提供API Key');
+        console.log('[SpeechSDK] 未提供OpenAI API Key，尝试使用环境变量');
       }
-      return new OpenAIRecognizer(config.apiKey, config.language || 'zh');
+      console.log(`[SpeechSDK] 创建OpenAIRecognizer, language=${config.language || 'zh'}`);
+      return new OpenAIRecognizer(config.apiKey || '', config.language || 'zh');
     case 'google':
       if (!config.apiKey) {
         throw new Error('Google Speech-to-Text需要提供API Key');

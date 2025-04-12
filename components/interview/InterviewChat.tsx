@@ -170,6 +170,20 @@ export default function InterviewChat() {
   
   const [lastAssistantMessage, setLastAssistantMessage] = useState<string>("");
   
+  // 调试日志 - 监控组件渲染
+  useEffect(() => {
+    console.log("[InterviewChat] 组件渲染，当前状态:");
+    console.log("- isStarted:", isStarted);
+    console.log("- isLoading:", isLoading);
+    console.log("- input内容:", input ? `[${input.length}字符]` : "空");
+    console.log("- 消息数量:", messages.length);
+  }, [isStarted, isLoading, input, messages.length]);
+  
+  // 调试日志 - 注意handleSpeechSubmit函数的可用性
+  useEffect(() => {
+    console.log("[InterviewChat] handleSpeechSubmit 是否可用:", typeof handleSpeechSubmit === "function");
+  }, []);
+  
   // 开始面试
   const startInterview = async () => {
     setIsLoading(true);
@@ -282,27 +296,48 @@ At the end of the interview, you will provide a brief assessment of the applican
   
   // 处理语音输入结果
   const handleSpeechResult = (text: string) => {
+    console.log("[InterviewChat] 收到语音识别结果:", text ? `[${text.length}字符]` : "空");
+    console.log("[InterviewChat] 识别前input:", input ? `[${input.length}字符]` : "空");
+    
     // 直接使用语音识别提供的文本，该文本已经包含了累积结果
     setInput(text);
     
     // 可以添加调试日志
     if (text.length > 100) {
-      console.log(`接收到长语音输入: ${text.length}字符, 前50字符: ${text.substring(0, 50)}...`);
+      console.log(`[InterviewChat] 接收到长语音输入: ${text.length}字符, 前50字符: ${text.substring(0, 50)}...`);
     }
   };
   
   // 处理语音输入完成后的自动提交
-  const handleSpeechSubmit = () => {
-    if (input.trim() && !isLoading && isStarted) {
+  const handleSpeechSubmit = (recognizedText?: string) => {
+    console.log("[InterviewChat] handleSpeechSubmit被触发, 参数:", recognizedText ? `[${recognizedText.length}字符]` : "无");
+    console.log("[InterviewChat] 当前input状态:", input ? `[${input.length}字符]` : "空");
+    console.log("[InterviewChat] isLoading:", isLoading, "isStarted:", isStarted);
+    
+    // 使用静态变量跟踪最后提交的文本，防止重复提交
+    if ((handleSpeechSubmit as any).lastSubmittedText === recognizedText) {
+      console.log("[InterviewChat] 检测到重复提交，忽略");
+      return;
+    }
+    (handleSpeechSubmit as any).lastSubmittedText = recognizedText;
+    
+    const textToSubmit = recognizedText || input;
+    console.log("[InterviewChat] 将使用文本:", textToSubmit ? `[${textToSubmit.length}字符]` : "空");
+    
+    if (textToSubmit.trim() && !isLoading && isStarted) {
+      console.log("[InterviewChat] 条件满足，准备提交文本:", textToSubmit.substring(0, 50) + (textToSubmit.length > 50 ? "..." : ""));
       // 直接调用发送消息函数，而不是模拟表单提交事件
-      const userMessage: Message = { role: "user", content: input };
+      const userMessage: Message = { role: "user", content: textToSubmit };
+      console.log("[InterviewChat] 创建用户消息:", userMessage);
       const newMessages: Message[] = [...messages, userMessage];
+      console.log("[InterviewChat] 更新消息列表，当前消息数:", newMessages.length);
       setMessages(newMessages);
       setInput("");
       setIsLoading(true);
       setError(null);
       
       const actualVisaType = visaType.split(" ")[0];
+      console.log("[InterviewChat] 开始发送请求...");
       
       // 发送对话请求
       fetch("/api/interview/chat", {
@@ -321,6 +356,7 @@ At the end of the interview, you will provide a brief assessment of the applican
         }),
       })
       .then(response => {
+        console.log("[InterviewChat] 收到响应，准备处理流式回复");
         handleStreamResponse(
           response,
           newMessages,
@@ -330,12 +366,18 @@ At the end of the interview, you will provide a brief assessment of the applican
         );
       })
       .catch(error => {
-        console.error("发送消息时出错:", error);
+        console.error("[InterviewChat] 发送消息时出错:", error);
         setError(`发送消息时出错: ${error instanceof Error ? error.message : String(error)}`);
       })
       .finally(() => {
+        console.log("[InterviewChat] 请求处理完成，重置加载状态");
         setIsLoading(false);
       });
+    } else {
+      console.log("[InterviewChat] 条件不满足，不提交文本:");
+      console.log("- 文本非空:", !!textToSubmit.trim());
+      console.log("- 非加载状态:", !isLoading);
+      console.log("- 面试已开始:", isStarted);
     }
   };
   

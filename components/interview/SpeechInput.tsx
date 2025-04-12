@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // Define component props
 interface SpeechInputProps {
   onResult: (text: string) => void;
-  onSubmit?: () => void; // Callback for auto-submit
+  onSubmit?: (text?: string) => void; // Callback for auto-submit with optional text param
   recognizerType?: 'web' | 'openai';
   apiKey?: string;
   language?: string;
@@ -26,6 +26,13 @@ export function SpeechInput({
   disabled = false,
   autoSubmit = true // Default enable auto-submit
 }: SpeechInputProps) {
+  console.log('[SpeechInput] 组件初始化');
+  console.log('[SpeechInput] recognizerType:', recognizerType);
+  console.log('[SpeechInput] language:', language);
+  console.log('[SpeechInput] autoSubmit:', autoSubmit);
+  console.log('[SpeechInput] onSubmit存在:', !!onSubmit);
+  console.log('[SpeechInput] onResult存在:', !!onResult);
+  
   const [isListening, setIsListening] = useState(false);
   const [recognizer, setRecognizer] = useState<SpeechRecognizer | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,15 +54,25 @@ export function SpeechInput({
       
       // Set result callback
       newRecognizer.onResult((text, isFinal) => {
+        console.log(`[SpeechInput] onResult 回调: text=${text ? text.substring(0, 30) + "..." : "空"}, isFinal=${isFinal}`);
+        setInterimText(isFinal ? "" : text);
+        
         if (isFinal) {
-          console.log("Received speech recognition result:", text);
-          lastTextRef.current = text; // Directly use API's complete recognition text
-          onResult(text);
-          setInterimText("");
-          setHasRecognizedText(true); // Mark that we have recognized text
-        } else {
-          // Non-final result, just show prompt
-          setInterimText(text);
+          // For final results, we accumulate the text
+          const updatedText = text.trim();
+          if (updatedText) {
+            // Use a callback form of lastTextRef.current to ensure we're working with the latest state
+            console.log(`[SpeechInput] 接收到最终结果，更新 lastTextRef: ${updatedText.substring(0, 30)}...`);
+            lastTextRef.current = updatedText;
+            setHasRecognizedText(true);
+            
+            // Immediately call onResult with the latest text
+            if (onResult) {
+              console.log(`[SpeechInput] 调用父组件 onResult 回调`);
+              onResult(updatedText);
+              console.log(`[SpeechInput] 父组件 onResult 回调已调用`);
+            }
+          }
         }
       });
       
@@ -69,23 +86,31 @@ export function SpeechInput({
       
       // Set stopped callback
       newRecognizer.onStopped(() => {
-        console.log("Speech recognition fully stopped");
+        console.log("[SpeechInput] Speech recognition fully stopped");
+        console.log("[SpeechInput] autoSubmit:", autoSubmit);
+        console.log("[SpeechInput] onSubmit callback exists:", !!onSubmit);
+        console.log("[SpeechInput] hasRecognizedText:", hasRecognizedText);
+        console.log("[SpeechInput] lastTextRef.current:", lastTextRef.current);
         setIsListening(false);
         setIsStopping(false);
         
         // After stopping recording, if auto-submit is enabled, trigger submission
         if (autoSubmit && onSubmit) {
-          // Ensure we have recognized text before submitting
-          if (hasRecognizedText && lastTextRef.current.trim()) {
-            console.log("Speech recognition fully stopped, auto-submitting last result:", lastTextRef.current);
+          // 修改：只要有文本内容就可以提交，不严格要求hasRecognizedText标志
+          if (lastTextRef.current.trim()) {
+            console.log("[SpeechInput] 准备自动提交识别结果:", lastTextRef.current);
             // Use setTimeout to ensure state is updated before submitting
             setTimeout(() => {
-              onSubmit();
+              console.log("[SpeechInput] 正在调用onSubmit回调...");
+              onSubmit(lastTextRef.current);
+              console.log("[SpeechInput] onSubmit回调已调用");
             }, 0);
             setHasRecognizedText(false); // Reset flag
           } else {
-            console.log("Speech recognition fully stopped, but no text was recognized, not submitting");
+            console.log("[SpeechInput] 未识别到文本或文本为空，不自动提交");
           }
+        } else {
+          console.log("[SpeechInput] 自动提交未启用或未提供onSubmit回调");
         }
       });
       
@@ -110,24 +135,45 @@ export function SpeechInput({
     try {
       if (isListening) {
         // Prevent duplicate stops
-        if (isStopping) return;
+        if (isStopping) {
+          console.log("[SpeechInput] 已经在停止过程中，忽略重复停止请求");
+          return;
+        }
         
+        console.log("[SpeechInput] 开始停止语音识别...");
         setIsStopping(true);
         setInterimText("Processing recording...");
-        console.log("Starting to stop speech recognition...");
+        console.log("[SpeechInput] 调用 recognizer.stop()");
         await recognizer.stop();
+        console.log("[SpeechInput] recognizer.stop() 完成");
+
+        // 备用提交机制：如果onStopped回调未被触发，这里提供一个额外保障
+        // 设置一个定时器，如果500ms后仍有文本且未被提交，则触发onSubmit
+        if (autoSubmit && onSubmit && lastTextRef.current.trim()) {
+          console.log("[SpeechInput] 设置备用提交定时器，500ms后检查是否需要提交");
+          setTimeout(() => {
+            // 此时如果仍然有文本且没有被提交过，说明onStopped回调可能没触发
+            if (lastTextRef.current.trim()) {
+              console.log("[SpeechInput] 触发备用提交机制:", lastTextRef.current);
+              onSubmit(lastTextRef.current);
+            }
+          }, 500);
+        }
+
         // Don't set isListening and trigger onSubmit here
         // This will be done in the onStopped callback
       } else {
+        console.log("[SpeechInput] 开始语音识别");
         setHasRecognizedText(false); // Reset flag
         lastTextRef.current = ""; // Clear previous text
         setInterimText("");
         await recognizer.start();
         setIsListening(true);
         setError(null);
+        console.log("[SpeechInput] 语音识别已开始");
       }
     } catch (error) {
-      console.error("Error toggling speech recognition state:", error);
+      console.error("[SpeechInput] 切换语音识别状态时出错:", error);
       setError(error instanceof Error ? error.message : String(error));
       setIsListening(false);
       setIsStopping(false);
