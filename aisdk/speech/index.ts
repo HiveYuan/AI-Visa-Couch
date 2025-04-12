@@ -66,6 +66,7 @@ export interface SpeechRecognizer {
   isListening(): boolean;
   onResult(callback: (text: string, isFinal: boolean) => void): void;
   onError(callback: (error: Error) => void): void;
+  onStopped(callback: () => void): void;
 }
 
 // 语音识别器配置
@@ -80,13 +81,11 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
   private listening = false;
   private resultCallback: ((text: string, isFinal: boolean) => void) | null = null;
   private errorCallback: ((error: Error) => void) | null = null;
-  private config: SpeechRecognizerConfig;
+  private stoppedCallback: (() => void) | null = null;
+  private language: string;
 
   constructor(config: SpeechRecognizerConfig = {}) {
-    this.config = {
-      language: 'zh-CN',
-      ...config
-    };
+    this.language = config.language || 'zh-CN';
     this.initRecognition();
   }
 
@@ -103,7 +102,7 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
       this.recognition = new SpeechRecognitionAPI();
       this.recognition.continuous = true;
       this.recognition.interimResults = true;
-      this.recognition.lang = this.config.language || 'zh-CN';
+      this.recognition.lang = this.language;
       this.recognition.maxAlternatives = 1;
 
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -189,14 +188,18 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
   }
 
   async stop(): Promise<void> {
-    if (!this.recognition || !this.listening) {
-      return;
-    }
+    if (!this.listening || !this.recognition) return;
 
     try {
-      this.recognition.stop();
+      this.recognition.abort();
       this.listening = false;
+      
+      // 触发停止回调
+      if (this.stoppedCallback) {
+        this.stoppedCallback();
+      }
     } catch (error) {
+      console.error("停止Web语音识别时出错:", error);
       throw error;
     }
   }
@@ -212,6 +215,10 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
   onError(callback: (error: Error) => void): void {
     this.errorCallback = callback;
   }
+
+  onStopped(callback: () => void): void {
+    this.stoppedCallback = callback;
+  }
 }
 
 // OpenAI Whisper API 实现
@@ -221,11 +228,14 @@ export class OpenAIRecognizer implements SpeechRecognizer {
   private audioChunks: Blob[] = [];
   private resultCallback: ((text: string, isFinal: boolean) => void) | null = null;
   private errorCallback: ((error: Error) => void) | null = null;
-  private apiKey: string;
+  private stoppedCallback: (() => void) | null = null;
   private language: string;
   private recognitionTimer: NodeJS.Timeout | null = null;
   private stream: MediaStream | null = null;
   private userStopped = false;
+  private apiKey: string;
+  private processingAudio = false;
+  private lastResultTime = 0;
 
   constructor(apiKey: string, language: string = 'zh') {
     this.apiKey = apiKey;
@@ -301,6 +311,12 @@ export class OpenAIRecognizer implements SpeechRecognizer {
       }
 
       this.listening = false;
+      
+      // 如果当前没有处理音频，直接触发停止回调
+      if (!this.processingAudio && this.stoppedCallback) {
+        console.log("语音识别完全停止，触发停止回调");
+        this.stoppedCallback();
+      }
     } catch (error) {
       console.error('停止OpenAI语音识别时出错:', error);
       throw error;
@@ -317,6 +333,10 @@ export class OpenAIRecognizer implements SpeechRecognizer {
 
   onError(callback: (error: Error) => void): void {
     this.errorCallback = callback;
+  }
+
+  onStopped(callback: () => void): void {
+    this.stoppedCallback = callback;
   }
 
   private startPeriodicRecognition(): void {
@@ -394,6 +414,9 @@ export class OpenAIRecognizer implements SpeechRecognizer {
   }
 
   private async processAudio(audioBlob: Blob): Promise<void> {
+    // 标记正在处理音频
+    this.processingAudio = true;
+    
     try {
       console.log(`处理音频数据，大小: ${audioBlob.size} 字节, 类型: ${audioBlob.type}`);
       if (audioBlob.size < 1000) {
@@ -444,53 +467,63 @@ export class OpenAIRecognizer implements SpeechRecognizer {
           const transcript = data.text.trim();
           if (transcript) {
             console.log(`获取到语音识别结果: "${transcript}"`);
+            this.lastResultTime = Date.now();
             this.resultCallback(transcript, true);
-            return; // 成功返回
           } else {
             console.log("收到空的识别结果");
           }
         }
-      }
-      
-      // 如果服务器API失败，尝试直接调用OpenAI API
-      if (!this.apiKey) {
-        // 如果没有API密钥，抛出之前保存的错误或新错误
-        throw error || new Error('未提供OpenAI API密钥，无法进行语音识别');
-      }
-      
-      console.log("尝试直接调用OpenAI API...");
-      const directFormData = new FormData();
-      directFormData.append('file', processedBlob, 'recording.webm');
-      directFormData.append('model', 'whisper-1'); // 必须提供model参数
-      directFormData.append('language', this.language);
-      
-      const directResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: directFormData
-      });
+      } else {
+        // 如果服务器API失败，尝试直接调用OpenAI API
+        if (!this.apiKey) {
+          // 如果没有API密钥，抛出之前保存的错误或新错误
+          throw error || new Error('未提供OpenAI API密钥，无法进行语音识别');
+        }
+        
+        console.log("尝试直接调用OpenAI API...");
+        const directFormData = new FormData();
+        directFormData.append('file', processedBlob, 'recording.webm');
+        directFormData.append('model', 'whisper-1'); // 必须提供model参数
+        directFormData.append('language', this.language);
+        
+        const directResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`
+          },
+          body: directFormData
+        });
 
-      if (!directResponse.ok) {
-        const errorData = await directResponse.json().catch(() => ({}));
-        throw new Error(`OpenAI API错误: ${directResponse.status} ${directResponse.statusText}${errorData.error ? ` - ${errorData.error.message || ''}` : ''}`);
-      }
+        if (!directResponse.ok) {
+          const errorData = await directResponse.json().catch(() => ({}));
+          throw new Error(`OpenAI API错误: ${directResponse.status} ${directResponse.statusText}${errorData.error ? ` - ${errorData.error.message || ''}` : ''}`);
+        }
 
-      const data = await directResponse.json();
-      if (data.text && this.resultCallback) {
-        const transcript = data.text.trim();
-        if (transcript) {
-          console.log(`获取到语音识别结果: "${transcript}"`);
-          this.resultCallback(transcript, true);
-        } else {
-          console.log("收到空的识别结果");
+        const data = await directResponse.json();
+        if (data.text && this.resultCallback) {
+          const transcript = data.text.trim();
+          if (transcript) {
+            console.log(`获取到语音识别结果: "${transcript}"`);
+            this.lastResultTime = Date.now();
+            this.resultCallback(transcript, true);
+          } else {
+            console.log("收到空的识别结果");
+          }
         }
       }
     } catch (error) {
       console.error('处理音频时出错:', error);
       if (this.errorCallback) {
         this.errorCallback(error instanceof Error ? error : new Error(String(error)));
+      }
+    } finally {
+      // 标记处理完成
+      this.processingAudio = false;
+      
+      // 如果是用户手动停止且设置了停止回调，触发回调
+      if (this.userStopped && this.stoppedCallback) {
+        console.log("语音识别完全停止，触发停止回调");
+        this.stoppedCallback();
       }
     }
   }
@@ -503,8 +536,10 @@ export class GoogleSpeechRecognizer implements SpeechRecognizer {
   private audioChunks: Blob[] = [];
   private resultCallback: ((text: string, isFinal: boolean) => void) | null = null;
   private errorCallback: ((error: Error) => void) | null = null;
+  private stoppedCallback: (() => void) | null = null;
   private apiKey: string;
   private language: string;
+  private processingAudio = false;
 
   constructor(apiKey: string, language: string = 'zh-CN') {
     this.apiKey = apiKey;
@@ -572,14 +607,19 @@ export class GoogleSpeechRecognizer implements SpeechRecognizer {
   async stop(): Promise<void> {
     if (!this.listening || !this.mediaRecorder) return;
 
-    this.listening = false;
     try {
       this.mediaRecorder.stop();
       // 停止所有轨道
       this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
       this.mediaRecorder = null;
+      this.listening = false;
+      
+      // 如果没有正在处理的音频，直接触发回调
+      if (!this.processingAudio && this.stoppedCallback) {
+        this.stoppedCallback();
+      }
     } catch (error) {
-      console.error('错误停止Google语音识别:', error);
+      console.error("停止Google语音识别时出错:", error);
       if (this.errorCallback) {
         this.errorCallback(error instanceof Error ? error : new Error(String(error)));
       }
@@ -596,6 +636,10 @@ export class GoogleSpeechRecognizer implements SpeechRecognizer {
 
   onError(callback: (error: Error) => void): void {
     this.errorCallback = callback;
+  }
+
+  onStopped(callback: () => void): void {
+    this.stoppedCallback = callback;
   }
 
   private async processAudio(audioBlob: Blob): Promise<void> {

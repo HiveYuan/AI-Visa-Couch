@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { VolumeX, Volume2 } from "lucide-react";
+import { VolumeX, Volume2, Pause, Play } from "lucide-react";
 
 // 定义组件属性
 interface SpeechOutputProps {
@@ -186,7 +186,12 @@ export function SpeechOutput({
       // 使用setTimeout来防抖，确保不会发出太多播放请求
       const timer = setTimeout(() => {
         if ((useOpenAI) || (!useOpenAI && utteranceRef.current)) {
-          handleSpeak();
+          try {
+            handleSpeak();
+          } catch (err) {
+            console.error("触发音频播放时出错:", err);
+            setError("触发音频播放失败");
+          }
         }
         playRequestRef.current = false;
       }, 300);
@@ -271,18 +276,44 @@ export function SpeechOutput({
         };
         
         audio.onerror = (e) => {
-          console.error("Data URL音频播放错误:", e);
+          // 获取更详细的错误信息
+          const errorDetails = audio.error ? 
+            `代码=${audio.error.code}, 消息=${audio.error.message || '无详细信息'}` : 
+            '未知错误';
+          console.error("Data URL音频播放错误:", errorDetails);
           setIsSpeaking(false);
           setError("Data URL音频播放失败");
-          if (onError) onError(new Error("Data URL音频播放失败"));
+          if (onError) onError(new Error(`Data URL音频播放失败: ${errorDetails}`));
           
           // base64失败时不要中断执行，让它继续尝试其他方法
-          throw e;
+          throw new Error(`Data URL播放失败: ${errorDetails}`);
         };
         
         // 尝试播放
         try {
-          await audio.play();
+          // 使用专门的函数来处理播放，添加重试机制
+          const tryPlayAudio = async (audioElement: HTMLAudioElement, maxRetries = 3) => {
+            let retries = 0;
+            while (retries < maxRetries) {
+              try {
+                console.log(`尝试播放Audio (尝试 ${retries + 1}/${maxRetries})`);
+                await audioElement.play();
+                console.log("Audio播放成功");
+                return true; // 播放成功
+              } catch (playErr) {
+                retries++;
+                console.warn(`播放失败 (${retries}/${maxRetries}):`, playErr);
+                if (retries >= maxRetries) {
+                  throw playErr; // 重试次数用完，抛出错误
+                }
+                // 等待一段时间再重试
+                await new Promise(resolve => setTimeout(resolve, 300));
+              }
+            }
+            return false;
+          };
+          
+          await tryPlayAudio(audio);
           // 如果播放成功，则保存引用并返回
           audioRef.current = audio;
           return;
@@ -428,18 +459,45 @@ export function SpeechOutput({
     };
     
     audio.onerror = (e) => {
-      // 获取更详细的错误信息
-      const errorCode = audio.error ? audio.error.code : 'unknown';
-      const errorMsg = audio.error ? 
-        ['MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK', 'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED'][audio.error.code - 1] || 'unknown error' : 
-        '未知错误';
+      // 获取最详细的错误信息
+      let errorMessage = '未知错误';
       
-      console.error(`OpenAI语音播放错误: 代码=${errorCode}, 类型=${errorMsg}, 数据大小=${size}字节, 格式=${format}`);
+      if (audio.error) {
+        // 标准MediaError错误码
+        const errorCodes: Record<number, string> = {
+          1: 'MEDIA_ERR_ABORTED - 播放被用户终止',
+          2: 'MEDIA_ERR_NETWORK - 网络错误导致音频下载失败',
+          3: 'MEDIA_ERR_DECODE - 解码错误，音频文件可能损坏',
+          4: 'MEDIA_ERR_SRC_NOT_SUPPORTED - 音频格式不支持或资源不可用'
+        };
+        
+        errorMessage = errorCodes[audio.error.code] || `未知错误(${audio.error.code})`;
+        
+        if (audio.error.message) {
+          errorMessage += `: ${audio.error.message}`;
+        }
+      }
+      
+      console.error(`音频加载错误: ${errorMessage}`, e);
+      
+      // 尝试获取更多信息
+      const audioSrc = audio.src ? (audio.src.length > 100 ? audio.src.substring(0, 50) + '...' : audio.src) : '无';
+      const audioState = {
+        currentSrc: audioSrc,
+        readyState: audio.readyState,
+        networkState: audio.networkState,
+        paused: audio.paused,
+        ended: audio.ended,
+        muted: audio.muted,
+        volume: audio.volume
+      };
+      
+      console.log('音频元素状态:', audioState);
       
       setIsSpeaking(false);
       URL.revokeObjectURL(url);
-      setError(`音频播放失败: ${errorMsg}`);
-      if (onError) onError(new Error(`音频播放错误: ${errorMsg}`));
+      setError(`音频播放失败: ${errorMessage}`);
+      if (onError) onError(new Error(`音频播放错误: ${errorMessage}`));
     };
     
     // 添加更多状态监听
@@ -473,14 +531,6 @@ export function SpeechOutput({
     // 检查并添加音频加载错误处理
     audio.addEventListener('loadedmetadata', () => {
       console.log(`音频(${format})元数据已加载，时长:`, audio.duration, "秒");
-    });
-    
-    // 添加错误处理，捕获加载过程中的错误
-    audio.addEventListener('error', (e) => {
-      const errorDetails = audio.error ? 
-        `代码=${audio.error.code}, 消息=${audio.error.message || '无详细信息'}` : 
-        '未知错误';
-      console.error(`音频加载错误: ${errorDetails}`, e);
     });
     
     // 设置音频源
@@ -564,20 +614,21 @@ export function SpeechOutput({
 
   // 渲染组件
   return (
-    <div className="relative">
+    <div className="speech-output">
       {showButton && (
         <Button
-          type="button"
-          disabled={disabled || (useOpenAI ? false : !utteranceRef.current) || !text || isLoading}
           onClick={handleSpeak}
-          variant={isSpeaking ? "destructive" : "outline"}
+          variant="ghost"
           size="icon"
-          className="rounded-full h-10 w-10"
-          title={isSpeaking ? "停止播放" : "朗读文本"}
+          disabled={disabled || isLoading}
+          className="size-8 p-0 rounded-full"
+          data-auto-play={autoplay ? "true" : "false"}
         >
-          {isLoading ? (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          ) : isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          {isSpeaking ? (
+            <Pause className="h-3 w-3" />
+          ) : (
+            <Play className="h-3 w-3" />
+          )}
         </Button>
       )}
       

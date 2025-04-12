@@ -118,6 +118,26 @@ async function handleStreamResponse(
     // 如果提供了设置最后消息的函数，更新最后的AI回复
     if (setLastMessageFn && text) {
       setLastMessageFn(text);
+      
+      // 增加延迟时间，确保DOM完全更新后再触发自动播放
+      setTimeout(() => {
+        try {
+          // 尝试查找并播放语音
+          const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
+          if (speechButton) {
+            console.log("找到最新AI回复的语音按钮，准备自动播放");
+            // 再增加一点延迟，确保组件完全挂载
+            setTimeout(() => {
+              speechButton.click();
+              console.log("触发了语音自动播放");
+            }, 200);
+          } else {
+            console.log("未找到自动播放按钮，可能DOM还未完全更新");
+          }
+        } catch (err) {
+          console.error("触发语音播放时出错:", err);
+        }
+      }, 800);
     }
   } catch (error) {
     console.error("处理流式响应时出错:", error);
@@ -265,6 +285,54 @@ export default function InterviewChat() {
     setInput(text);
   };
   
+  // 处理语音输入完成后的自动提交
+  const handleSpeechSubmit = () => {
+    if (input.trim() && !isLoading && isStarted) {
+      // 直接调用发送消息函数，而不是模拟表单提交事件
+      const userMessage: Message = { role: "user", content: input };
+      const newMessages: Message[] = [...messages, userMessage];
+      setMessages(newMessages);
+      setInput("");
+      setIsLoading(true);
+      setError(null);
+      
+      const actualVisaType = visaType.split(" ")[0];
+      
+      // 发送对话请求
+      fetch("/api/interview/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: newMessages,
+          options: {
+            visaType: actualVisaType,
+            interviewType,
+            travelPurpose,
+            difficulty,
+          },
+        }),
+      })
+      .then(response => {
+        handleStreamResponse(
+          response,
+          newMessages,
+          (newMessages) => setMessages(newMessages),
+          (errorMsg) => setError(errorMsg),
+          (text) => setLastAssistantMessage(text)
+        );
+      })
+      .catch(error => {
+        console.error("发送消息时出错:", error);
+        setError(`发送消息时出错: ${error instanceof Error ? error.message : String(error)}`);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+    }
+  };
+  
   // 获取面试反馈
   const getFeedback = async () => {
     if (messages.length < 3) return; // 需要有足够的对话内容才能生成反馈
@@ -344,8 +412,10 @@ export default function InterviewChat() {
         />
         <SpeechInput 
           onResult={handleSpeechResult}
+          onSubmit={handleSpeechSubmit}
           disabled={isLoading || !isStarted}
           recognizerType="openai"
+          autoSubmit={true}
         />
         <Button type="submit" disabled={isLoading || !isStarted || !input.trim()}>
           发送
@@ -357,6 +427,7 @@ export default function InterviewChat() {
   // 渲染消息气泡
   const renderMessage = (message: Message, index: number) => {
     const isAssistant = message.role === "assistant";
+    const isLatestAssistantMsg = isAssistant && message.content === lastAssistantMessage;
     
     return (
       <div
@@ -385,10 +456,13 @@ export default function InterviewChat() {
             {message.content}
             
             {isAssistant && (
-              <div className="opacity-0 group-hover:opacity-100 absolute -right-10 top-1/2 transform -translate-y-1/2 transition-opacity">
+              <div className={cn(
+                "absolute -right-10 top-1/2 transform -translate-y-1/2 transition-opacity",
+                isLatestAssistantMsg ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              )}>
                 <SpeechOutput 
                   text={message.content}
-                  autoplay={message.content === lastAssistantMessage}
+                  autoplay={isLatestAssistantMsg}
                   useOpenAI={true}
                   voice="nova" // 使用nova声音，适合中文发音的女性声音
                   language="zh"
