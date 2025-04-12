@@ -13,6 +13,13 @@ import { SpeechOutput } from "@/components/SpeechOutputFixed";
 type Message = {
   role: "user" | "assistant" | "system";
   content: string;
+  reasoning?: string;
+  analysis?: {
+    badSignals: string[];
+    goodSignals: string[];
+    unclear: string[];
+    nextSteps: string;
+  };
 };
 
 type InterviewOptions = {
@@ -168,6 +175,14 @@ export default function InterviewChat() {
   // 自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  // 新增生成思考过程状态
+  const [isGeneratingReasoning, setIsGeneratingReasoning] = useState(false);
+  
+  // 语音合成配置
+  const localeLang = "en-US"; // 语音合成使用的语言
+  const systemVoice = "alloy"; // 语音合成使用的声音
+  
+  // 恢复lastAssistantMessage变量
   const [lastAssistantMessage, setLastAssistantMessage] = useState<string>("");
   
   // 调试日志 - 监控组件渲染
@@ -208,7 +223,10 @@ Please conduct the interview in English with a difficulty level of ${difficulty.
 Your goal is to assess the applicant's true intent, the reasonableness of their travel plans, the appropriate length of stay, and their ties to China.
 During the interview, ask questions that reflect a real visa interview and follow up based on the applicant's responses.
 Maintain a professional, serious but polite attitude.
-Limit each response to 1-2 questions to keep the conversation flowing.
+
+EXTREMELY IMPORTANT: Ask ONLY ONE QUESTION at a time. For your first question, just say a brief greeting and ask about their purpose of travel. For example: "Good morning. What is the purpose of your visit to the United States?"
+
+DO NOT ask multiple questions in a single response. This is critical for the flow of the interview.
 Interview characteristics: questions are brief and direct, typically without much explanation, and rapid topic changes are common.
 At the end of the interview, you will provide a brief assessment of the applicant's performance and an analysis of whether they are likely to receive a visa.`,
     };
@@ -218,24 +236,70 @@ At the end of the interview, you will provide a brief assessment of the applican
     setMessages(initialMessages);
     
     try {
-      const response = await fetch("/api/interview/chat", {
+      // 使用生成思考和问题的方式处理第一个问题，而不是直接使用流式输出
+      // 这样可以确保第一个问题不会一次性输出多个问题
+      const initialReasoning = "This is the start of the interview, I should first greet the applicant and then ask about their travel purpose. I need to maintain professionalism and politeness, just asking a simple and clear question. ";
+      
+      // 生成第一个问题
+      const questionResponse = await fetch("/api/interview/next-question", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          reasoning: initialReasoning,
           messages: initialMessages,
           options,
         }),
       });
       
-      await handleStreamResponse(
-        response,
-        initialMessages,
-        (newMessages) => setMessages(newMessages),
-        (errorMsg) => setError(errorMsg),
-        (text) => setLastAssistantMessage(text)
-      );
+      if (!questionResponse.ok) {
+        const errorText = await questionResponse.text();
+        throw new Error(`Failed to generate initial question: ${questionResponse.status} ${errorText}`);
+      }
+      
+      const questionData = await questionResponse.json();
+      const firstQuestion = questionData.data?.question;
+      
+      if (!firstQuestion) {
+        throw new Error("Failed to generate initial question");
+      }
+      
+      // 添加初始问题消息
+      const assistantMessage: Message = { 
+        role: "assistant", 
+        content: firstQuestion,
+        reasoning: initialReasoning,
+        analysis: {
+          badSignals: [],
+          goodSignals: [],
+          unclear: [],
+          nextSteps: "Ask about the applicant's travel purpose"
+        }
+      };
+      
+      setMessages([...initialMessages, assistantMessage]);
+      setLastAssistantMessage(firstQuestion);
+      
+      // 添加延迟以确保DOM完全更新后触发自动播放
+      setTimeout(() => {
+        try {
+          // 尝试查找并播放声音
+          const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
+          if (speechButton) {
+            console.log("Found the speech button for the initial question, preparing to auto-play");
+            // 添加更多延迟以确保组件完全装载
+            setTimeout(() => {
+              speechButton.click();
+              console.log("Triggered voice auto-play for initial question");
+            }, 200);
+          } else {
+            console.log("Auto-play button not found, DOM may not be fully updated");
+          }
+        } catch (err) {
+          console.error("Error triggering voice playback:", err);
+        }
+      }, 800);
       
       setIsStarted(true);
     } catch (error) {
@@ -246,7 +310,7 @@ At the end of the interview, you will provide a brief assessment of the applican
     }
   };
   
-  // 发送消息
+  // 修改handleSubmit函数，使用新的两步API流程
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -261,36 +325,104 @@ At the end of the interview, you will provide a brief assessment of the applican
     
     try {
       const actualVisaType = visaType.split(" ")[0];
+      const interviewOptions = {
+        visaType: actualVisaType,
+        interviewType,
+        travelPurpose,
+        difficulty,
+      };
       
-      // 发送对话请求
-      const response = await fetch("/api/interview/chat", {
+      // 步骤1：生成思考过程
+      setIsGeneratingReasoning(true);
+      const reasoningResponse = await fetch("/api/interview/reasoning", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           messages: newMessages,
-          options: {
-            visaType: actualVisaType,
-            interviewType,
-            travelPurpose,
-            difficulty,
-          },
+          options: interviewOptions,
         }),
       });
       
-      await handleStreamResponse(
-        response,
-        newMessages,
-        (newMessages) => setMessages(newMessages),
-        (errorMsg) => setError(errorMsg),
-        (text) => setLastAssistantMessage(text)
-      );
+      if (!reasoningResponse.ok) {
+        const errorText = await reasoningResponse.text();
+        throw new Error(`Reasoning request failed: ${reasoningResponse.status} ${errorText}`);
+      }
+      
+      const reasoningData = await reasoningResponse.json();
+      const reasoning = reasoningData.data?.reasoning;
+      
+      if (!reasoning) {
+        throw new Error("Failed to generate reasoning");
+      }
+      
+      // 分析思考过程，提取关键信息
+      const analysis = analyzeReasoning(reasoning);
+      
+      // 步骤2：生成下一个问题
+      setIsGeneratingReasoning(false);
+      const questionResponse = await fetch("/api/interview/next-question", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reasoning,
+          messages: newMessages,
+          options: interviewOptions,
+        }),
+      });
+      
+      if (!questionResponse.ok) {
+        const errorText = await questionResponse.text();
+        throw new Error(`Question request failed: ${questionResponse.status} ${errorText}`);
+      }
+      
+      const questionData = await questionResponse.json();
+      const question = questionData.data?.question;
+      
+      if (!question) {
+        throw new Error("Failed to generate question");
+      }
+      
+      // 添加包含思考过程的消息
+      const assistantMessage: Message = { 
+        role: "assistant", 
+        content: question,
+        reasoning: reasoning,
+        analysis: analysis
+      };
+      
+      setMessages([...newMessages, assistantMessage]);
+      setLastAssistantMessage(question);
+      
+      // 添加延迟以确保DOM完全更新后触发自动播放
+      setTimeout(() => {
+        try {
+          // 尝试查找并播放声音
+          const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
+          if (speechButton) {
+            console.log("Found the speech button for the latest AI reply, preparing to auto-play");
+            // 添加更多延迟以确保组件完全装载
+            setTimeout(() => {
+              speechButton.click();
+              console.log("Triggered voice auto-play");
+            }, 200);
+          } else {
+            console.log("Auto-play button not found, DOM may not be fully updated");
+          }
+        } catch (err) {
+          console.error("Error triggering voice playback:", err);
+        }
+      }, 800);
+      
     } catch (error) {
       console.error("发送消息时出错:", error);
       setError(`发送消息时出错: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsLoading(false);
+      setIsGeneratingReasoning(false);
     }
   };
   
@@ -308,7 +440,7 @@ At the end of the interview, you will provide a brief assessment of the applican
     }
   };
   
-  // 处理语音输入完成后的自动提交
+  // 同样修改handleSpeechSubmit函数，使用新的两步API流程
   const handleSpeechSubmit = (recognizedText?: string) => {
     console.log("[InterviewChat] handleSpeechSubmit被触发, 参数:", recognizedText ? `[${recognizedText.length}字符]` : "无");
     console.log("[InterviewChat] 当前input状态:", input ? `[${input.length}字符]` : "空");
@@ -339,8 +471,9 @@ At the end of the interview, you will provide a brief assessment of the applican
       const actualVisaType = visaType.split(" ")[0];
       console.log("[InterviewChat] 开始发送请求...");
       
-      // 发送对话请求
-      fetch("/api/interview/chat", {
+      // 步骤1：生成思考过程
+      setIsGeneratingReasoning(true);
+      fetch("/api/interview/reasoning", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -356,14 +489,85 @@ At the end of the interview, you will provide a brief assessment of the applican
         }),
       })
       .then(response => {
-        console.log("[InterviewChat] 收到响应，准备处理流式回复");
-        handleStreamResponse(
-          response,
-          newMessages,
-          (newMessages) => setMessages(newMessages),
-          (errorMsg) => setError(errorMsg),
-          (text) => setLastAssistantMessage(text)
-        );
+        if (!response.ok) {
+          return response.text().then(text => {
+            throw new Error(`Reasoning request failed: ${response.status} ${text}`);
+          });
+        }
+        return response.json();
+      })
+      .then(reasoningData => {
+        const reasoning = reasoningData.data?.reasoning;
+        if (!reasoning) {
+          throw new Error("Failed to generate reasoning");
+        }
+        
+        // 分析思考过程，提取关键信息
+        const analysis = analyzeReasoning(reasoning);
+        
+        // 步骤2：生成下一个问题
+        setIsGeneratingReasoning(false);
+        return fetch("/api/interview/next-question", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            reasoning,
+            messages: newMessages,
+            options: {
+              visaType: actualVisaType,
+              interviewType,
+              travelPurpose,
+              difficulty,
+            },
+          }),
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(`Question request failed: ${response.status} ${text}`);
+            });
+          }
+          return response.json();
+        })
+        .then(questionData => {
+          const question = questionData.data?.question;
+          if (!question) {
+            throw new Error("Failed to generate question");
+          }
+          
+          // 添加包含思考过程的消息
+          const assistantMessage: Message = { 
+            role: "assistant", 
+            content: question,
+            reasoning: reasoning,
+            analysis: analysis
+          };
+          
+          setMessages([...newMessages, assistantMessage]);
+          setLastAssistantMessage(question);
+          
+          // 添加延迟以确保DOM完全更新后触发自动播放
+          setTimeout(() => {
+            try {
+              // 尝试查找并播放声音
+              const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
+              if (speechButton) {
+                console.log("Found the speech button for the latest AI reply, preparing to auto-play");
+                // 添加更多延迟以确保组件完全装载
+                setTimeout(() => {
+                  speechButton.click();
+                  console.log("Triggered voice auto-play");
+                }, 200);
+              } else {
+                console.log("Auto-play button not found, DOM may not be fully updated");
+              }
+            } catch (err) {
+              console.error("Error triggering voice playback:", err);
+            }
+          }, 800);
+        });
       })
       .catch(error => {
         console.error("[InterviewChat] 发送消息时出错:", error);
@@ -372,6 +576,7 @@ At the end of the interview, you will provide a brief assessment of the applican
       .finally(() => {
         console.log("[InterviewChat] 请求处理完成，重置加载状态");
         setIsLoading(false);
+        setIsGeneratingReasoning(false);
       });
     } else {
       console.log("[InterviewChat] 条件不满足，不提交文本:");
@@ -448,86 +653,213 @@ At the end of the interview, you will provide a brief assessment of the applican
     setShowFeedback(false);
   };
   
-  // 渲染聊天表单
-  const renderChatForm = () => {
-    return (
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t pt-4">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your answer..."
-          disabled={isLoading || !isStarted}
-          className="flex-1"
-        />
-        <SpeechInput 
-          onResult={handleSpeechResult}
-          onSubmit={handleSpeechSubmit}
-          disabled={isLoading || !isStarted}
-          recognizerType="openai"
-          language="en"
-          autoSubmit={true}
-        />
-        <Button type="submit" disabled={isLoading || !isStarted || !input.trim()}>
-          Send
-        </Button>
-      </form>
-    );
-  };
-  
-  // 渲染消息气泡
+  // 使用类名选择器而非ref或id
   const renderMessage = (message: Message, index: number) => {
-    const isAssistant = message.role === "assistant";
-    const isLatestAssistantMsg = isAssistant && message.content === lastAssistantMessage;
+    const isUser = message.role === "user";
+    const isLatestAssistantMessage = !isUser && index === messages.length - 1;
     
     return (
-      <div
-        key={index}
-        className={cn(
-          "flex",
-          isAssistant ? "justify-start" : "justify-end"
-        )}
-      >
-        <div className="flex items-start max-w-[80%] space-x-2">
-          {isAssistant && (
-            <Avatar className="mt-1">
-              <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+      <div key={index} className={cn("flex", { "justify-end": isUser, "justify-start": !isUser })}>
+        <div className="relative flex items-start">
+          {!isUser && (
+            <Avatar className="mt-1 mr-2 flex-shrink-0">
+              <div className="w-full h-full bg-primary text-white flex items-center justify-center font-bold">
                 VO
               </div>
             </Avatar>
           )}
-          <div
-            className={cn(
-              "rounded-lg px-4 py-2 text-sm group relative",
-              isAssistant
-                ? "bg-muted text-foreground"
-                : "bg-primary text-primary-foreground"
-            )}
-          >
-            {message.content}
-            
-            {isAssistant && (
-              <div className={cn(
-                "absolute -right-10 top-1/2 transform -translate-y-1/2 transition-opacity",
-                isLatestAssistantMsg ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              )}>
-                <SpeechOutput 
-                  text={message.content}
-                  autoplay={isLatestAssistantMsg}
-                  useOpenAI={true}
-                  voice="alloy" 
-                  language="en"
-                />
-              </div>
-            )}
+          
+          <div className="flex flex-col max-w-md">
+            {/* 实际消息内容 */}
+            <div
+              className={cn(
+                "px-4 py-2 rounded-lg",
+                { "bg-primary text-primary-foreground": isUser },
+                { "bg-card border": !isUser }
+              )}
+            >
+              <div className="whitespace-pre-wrap">{message.content}</div>
+              {!isUser && (
+                <div className="mt-2 pt-2 border-t">
+                  <SpeechOutput
+                    text={message.content}
+                    autoplay={isLatestAssistantMessage}
+                    language={localeLang}
+                    voice={systemVoice}
+                    data-auto-play={isLatestAssistantMessage}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-          {message.role === "user" && (
-            <Avatar className="mt-1">
-              <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center font-semibold">
-                You
+          
+          {isUser && (
+            <Avatar className="mt-1 ml-2 flex-shrink-0">
+              <div className="w-full h-full bg-background border text-foreground flex items-center justify-center font-bold">
+                Me
               </div>
             </Avatar>
           )}
         </div>
+      </div>
+    );
+  };
+  
+  // 渲染思考侧边栏
+  const renderThoughtSidebar = () => {
+    // 获取所有助手消息，用于显示历史思考
+    const assistantMessages = messages
+      .filter(m => m.role === "assistant" && (m.reasoning || m.analysis))
+      .reverse(); // 最新的思考在前面
+    
+    if (assistantMessages.length === 0) {
+      return (
+        <div className="px-4 py-6 text-center text-muted-foreground">
+          Visa officer's thoughts will be displayed here
+        </div>
+      );
+    }
+    
+    // 当前最新的思考
+    const lastAssistantMsg = assistantMessages[0];
+    
+    return (
+      <div className="p-4 space-y-6 overflow-y-auto">
+        <h3 className="text-lg font-semibold">Visa Officer's Thoughts</h3>
+        
+        {/* 最新的思考 */}
+        <div className="space-y-4">
+          <div className="font-medium text-sm flex items-center justify-between">
+            <span>Current Thoughts</span>
+            <span className="text-xs bg-primary/10 px-2 py-1 rounded-full">Latest</span>
+          </div>
+          
+          {lastAssistantMsg.analysis && (
+            <div className="space-y-4">
+              {/* 正面信号 */}
+              {lastAssistantMsg.analysis.goodSignals.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-green-600 flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-green-600 mr-2"></div>
+                    Positive Signals
+                  </h4>
+                  <ul className="space-y-1 text-sm">
+                    {lastAssistantMsg.analysis.goodSignals.map((signal: string, i: number) => (
+                      <li key={i} className="border-l-2 border-green-200 pl-2 py-1 text-green-800">
+                        {signal}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* 负面信号 */}
+              {lastAssistantMsg.analysis.badSignals.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-red-600 flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-red-600 mr-2"></div>
+                    Concerns
+                  </h4>
+                  <ul className="space-y-1 text-sm">
+                    {lastAssistantMsg.analysis.badSignals.map((signal: string, i: number) => (
+                      <li key={i} className="border-l-2 border-red-200 pl-2 py-1 text-red-800">
+                        {signal}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* 不明确信息 */}
+              {lastAssistantMsg.analysis.unclear.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-amber-600 flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-amber-600 mr-2"></div>
+                    Unclear Information
+                  </h4>
+                  <ul className="space-y-1 text-sm">
+                    {lastAssistantMsg.analysis.unclear.map((item: string, i: number) => (
+                      <li key={i} className="border-l-2 border-amber-200 pl-2 py-1 text-amber-800">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* 下一步 */}
+              {lastAssistantMsg.analysis.nextSteps && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-blue-600 flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-blue-600 mr-2"></div>
+                    Next Steps
+                  </h4>
+                  <div className="border-l-2 border-blue-200 pl-2 py-1 text-sm text-blue-800">
+                    {lastAssistantMsg.analysis.nextSteps}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* 原始思考过程 */}
+          <div className="mt-2">
+            <details>
+              <summary className="text-sm font-medium text-muted-foreground cursor-pointer">
+                View Full Thought Process
+              </summary>
+              <div className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">
+                {lastAssistantMsg.reasoning}
+              </div>
+            </details>
+          </div>
+        </div>
+        
+        {/* 历史思考 */}
+        {assistantMessages.length > 1 && (
+          <div className="mt-6 pt-4 border-t">
+            <h4 className="text-sm font-medium mb-3">Thought History</h4>
+            <div className="space-y-4">
+              {assistantMessages.slice(1).map((msg, index) => (
+                <details key={index} className="border rounded-lg p-2">
+                  <summary className="text-sm cursor-pointer">
+                    Round {assistantMessages.length - index - 1} Thoughts
+                  </summary>
+                  <div className="mt-2 pt-2 border-t text-sm">
+                    <div className="space-y-2">
+                      {msg.analysis?.goodSignals && msg.analysis.goodSignals.length > 0 && (
+                        <div>
+                          <span className="text-green-600 font-medium">Positive Signals: </span>
+                          <span>{msg.analysis.goodSignals.length} items</span>
+                        </div>
+                      )}
+                      {msg.analysis?.badSignals && msg.analysis.badSignals.length > 0 && (
+                        <div>
+                          <span className="text-red-600 font-medium">Concerns: </span>
+                          <span>{msg.analysis.badSignals.length} items</span>
+                        </div>
+                      )}
+                      {msg.analysis?.unclear && msg.analysis.unclear.length > 0 && (
+                        <div>
+                          <span className="text-amber-600 font-medium">Unclear: </span>
+                          <span>{msg.analysis.unclear.length} items</span>
+                        </div>
+                      )}
+                      <details>
+                        <summary className="cursor-pointer text-xs text-muted-foreground">
+                          View Details
+                        </summary>
+                        <div className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">
+                          {msg.reasoning}
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -652,45 +984,172 @@ At the end of the interview, you will provide a brief assessment of the applican
     );
   };
 
+  // 思考过程分析函数
+  const analyzeReasoning = (reasoning: string) => {
+    const badSignals: string[] = [];
+    const goodSignals: string[] = [];
+    const unclear: string[] = [];
+    let nextSteps = "";
+    
+    // 拆分段落
+    const paragraphs = reasoning.split(/\n+/).filter(p => p.trim());
+    
+    // 分析每个段落，提取关键信息
+    paragraphs.forEach(paragraph => {
+      const p = paragraph.toLowerCase();
+      
+      // 识别负面信号
+      if (
+        p.includes("suspicious") || 
+        p.includes("concern") || 
+        p.includes("inconsistent") || 
+        p.includes("questionable") || 
+        p.includes("doesn't make sense") || 
+        p.includes("doesn't add up") || 
+        p.includes("red flag") || 
+        p.includes("问题") || 
+        p.includes("可疑") || 
+        p.includes("不一致")
+      ) {
+        badSignals.push(paragraph);
+      }
+      
+      // 识别正面信号
+      else if (
+        p.includes("credible") || 
+        p.includes("consistent") || 
+        p.includes("strong ties") || 
+        p.includes("good understanding") || 
+        p.includes("convincing") || 
+        p.includes("positive") || 
+        p.includes("clear") || 
+        p.includes("可信") || 
+        p.includes("一致") || 
+        p.includes("明确")
+      ) {
+        goodSignals.push(paragraph);
+      }
+      
+      // 识别不明确信息
+      else if (
+        p.includes("unclear") || 
+        p.includes("vague") || 
+        p.includes("ambiguous") || 
+        p.includes("need more information") || 
+        p.includes("need to clarify") || 
+        p.includes("不明确") || 
+        p.includes("模糊") ||
+        p.includes("需要更多信息")
+      ) {
+        unclear.push(paragraph);
+      }
+      
+      // 识别下一步
+      if (
+        p.includes("next") || 
+        p.includes("follow up") || 
+        p.includes("ask about") || 
+        p.includes("need to inquire") || 
+        p.includes("will ask") ||
+        p.includes("下一个问题") ||
+        p.includes("接下来") ||
+        p.includes("我要问")
+      ) {
+        nextSteps = paragraph;
+      }
+    });
+    
+    // 如果没有找到明确的下一步，尝试使用最后一个段落
+    if (!nextSteps && paragraphs.length > 0) {
+      nextSteps = paragraphs[paragraphs.length - 1];
+    }
+    
+    return {
+      badSignals,
+      goodSignals,
+      unclear,
+      nextSteps
+    };
+  };
+
   return (
-    <div className="container max-w-4xl mx-auto py-6 space-y-8">
-      {!isStarted ? (
-        renderConfigForm()
-      ) : (
-        <>
+    <div className="flex flex-col h-[80vh]">
+      {isStarted ? (
+        <div className="flex flex-col flex-grow overflow-hidden">
           {renderInterviewHeader()}
           
-          <div className="space-y-4 mb-4 max-h-[60vh] overflow-y-auto p-4 border rounded-lg">
-            {messages.filter(m => m.role !== "system").map((message, index) => 
-              renderMessage(message, index)
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-          
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
-              {error}
+          <div className="flex flex-grow overflow-hidden">
+            {/* 主要对话区域 */}
+            <div className="flex-grow flex flex-col overflow-hidden border-r">
+              {/* 消息列表 */}
+              <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                {messages.filter(m => m.role !== "system").map(renderMessage)}
+                <div ref={messagesEndRef} />
+              </div>
+              
+              {/* 输入区域 */}
+              <div className="p-4 border-t">
+                {error && <div className="text-red-500 mb-2 text-sm">{error}</div>}
+                <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+                  {/* 思考过程生成状态指示器 */}
+                  {isGeneratingReasoning && (
+                    <div className="text-sm text-muted-foreground animate-pulse mr-2">
+                      Visa officer is thinking...
+                    </div>
+                  )}
+                  
+                  <div className="flex-grow flex items-center space-x-2">
+                    {/* 文本输入 */}
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Enter your response..."
+                      className="flex-grow"
+                      disabled={isLoading || isGeneratingReasoning}
+                    />
+                    
+                    {/* 语音输入组件 */}
+                    <SpeechInput
+                      onResult={handleSpeechResult}
+                      onSubmit={handleSpeechSubmit}
+                      disabled={isLoading}
+                      placeholder="Click microphone to speak"
+                    />
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || isGeneratingReasoning || !input.trim()} 
+                    className="shrink-0"
+                  >
+                    {isLoading ? "Sending..." : "Send"}
+                  </Button>
+                </form>
+              </div>
             </div>
-          )}
-          
-          {renderChatForm()}
-        </>
+            
+            {/* 思考过程侧边栏 */}
+            <div className="w-1/3 border-l bg-muted/30 overflow-y-auto">
+              {renderThoughtSidebar()}
+            </div>
+          </div>
+        </div>
+      ) : (
+        renderConfigForm()
       )}
       
-      <Dialog open={showFeedback} onOpenChange={setShowFeedback}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      {/* 反馈对话框 */}
+      <Dialog open={showFeedback} onOpenChange={closeFeedbackDialog}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Interview Feedback</DialogTitle>
             <DialogDescription>
-              Analysis of your interview performance
+              Our AI has evaluated your performance in this interview
             </DialogDescription>
           </DialogHeader>
-          <div className="prose prose-sm mt-4 max-w-none">
-            {feedback.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+          <div className="max-h-[70vh] overflow-y-auto whitespace-pre-wrap">
+            {feedback}
           </div>
-          <Button onClick={closeFeedbackDialog} className="mt-4">Close</Button>
         </DialogContent>
       </Dialog>
     </div>

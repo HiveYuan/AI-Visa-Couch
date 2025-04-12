@@ -15,6 +15,8 @@ interface SpeechInputProps {
   language?: string;
   disabled?: boolean;
   autoSubmit?: boolean; // Whether to auto-submit when microphone is closed
+  className?: string; // 添加className属性
+  placeholder?: string; // 添加placeholder属性
 }
 
 export function SpeechInput({
@@ -24,7 +26,9 @@ export function SpeechInput({
   apiKey,
   language = 'en-US', // Default to English
   disabled = false,
-  autoSubmit = true // Default enable auto-submit
+  autoSubmit = true, // Default enable auto-submit
+  className, // 添加className属性
+  placeholder // 添加placeholder属性
 }: SpeechInputProps) {
   console.log('[SpeechInput] 组件初始化');
   console.log('[SpeechInput] recognizerType:', recognizerType);
@@ -185,7 +189,7 @@ export function SpeechInput({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="relative">
+          <div className={`relative ${className || ''}`}>
             <Button
               type="button"
               disabled={disabled || !recognizer || isStopping}
@@ -198,33 +202,22 @@ export function SpeechInput({
               {isListening ? <MicOff size={18} /> : <Mic size={18} />}
             </Button>
             
-            {interimText && (
-              <div className="absolute bottom-full mb-2 p-2 bg-slate-800 text-white rounded-md text-sm min-w-48 max-w-96">
-                {interimText}
-              </div>
-            )}
-            
-            {isStopping && (
-              <div className="absolute bottom-full mb-2 p-2 bg-amber-600 text-white rounded-md text-sm min-w-48 max-w-96">
-                Processing...
+            {/* Show interim text as a tooltip-like popup when recording */}
+            {isListening && interimText && (
+              <div className="absolute left-0 bottom-full mb-2 bg-card text-foreground px-3 py-2 rounded shadow-md text-sm max-w-xs z-10">
+                {placeholder && !interimText ? placeholder : interimText}
               </div>
             )}
             
             {error && (
-              <div className="absolute bottom-full mb-2 p-2 bg-red-600 text-white rounded-md text-sm min-w-48 max-w-96">
-                Error: {error}
+              <div className="absolute left-0 bottom-full mb-2 bg-destructive text-destructive-foreground px-3 py-2 rounded shadow-md text-sm max-w-xs z-10">
+                {error}
               </div>
             )}
           </div>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>{isListening ? "Click to stop voice input" : "Start voice input"}</p>
-          {isListening && recognizerType === 'openai' && (
-            <p className="text-xs mt-1">Listening continuously - click stop when finished</p>
-          )}
-          {autoSubmit && (
-            <p className="text-xs mt-1">Will auto-send text after stopping</p>
-          )}
+        <TooltipContent side="top">
+          {isListening ? "停止录音" : placeholder || "开始录音"}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
