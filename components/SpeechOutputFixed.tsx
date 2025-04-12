@@ -46,6 +46,21 @@ export function SpeechOutput({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const playRequestRef = useRef<boolean>(false); // 防止多次播放请求
+  
+  // 组件挂载时记录状态
+  useEffect(() => {
+    console.log(`[SpeechOutput] 组件挂载, autoplay=${autoplay}, text长度=${text?.length || 0}`);
+    
+    // 如果设置了自动播放，返回一个清理函数，该函数在组件卸载时触发
+    return () => {
+      console.log(`[SpeechOutput] 组件卸载`);
+    };
+  }, []);
+  
+  // 如果autoplay状态变化，输出日志
+  useEffect(() => {
+    console.log(`[SpeechOutput] autoplay状态变化: ${autoplay}`);
+  }, [autoplay]);
 
   // 初始化浏览器语音合成器
   useEffect(() => {
@@ -115,6 +130,7 @@ export function SpeechOutput({
   // 当文本变化时重置播放状态
   useEffect(() => {
     // 文本变化时重置播放状态
+    console.log(`[SpeechOutput] 文本变化，重置播放状态: 文本长度=${text?.length || 0}`);
     playedRef.current = false;
     
     // 如果正在播放，停止
@@ -177,34 +193,121 @@ export function SpeechOutput({
     utteranceRef.current = newUtterance;
   }, [text, language, selectedVoice, rate, pitch, volume, onStart, onEnd, onError, useOpenAI]);
 
-  // 当鼠标悬停时自动播放，添加防抖功能
+  // 播放语音
+  const handleSpeak = useCallback(() => {
+    // 防止重复播放请求
+    if (playRequestRef.current) return;
+    playRequestRef.current = true;
+    
+    if (useOpenAI) {
+      // 如果正在播放，停止播放
+      if (isSpeaking && audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        if (audioRef.current.src) {
+          URL.revokeObjectURL(audioRef.current.src);
+        }
+        audioRef.current = null;
+        setIsSpeaking(false);
+        playRequestRef.current = false;
+        return;
+      }
+      
+      // 否则使用OpenAI TTS
+      handleOpenAITTS();
+      playRequestRef.current = false;
+      return;
+    }
+    
+    // 使用Web Speech API
+    if (!utteranceRef.current || typeof window === 'undefined' || !window.speechSynthesis) {
+      playRequestRef.current = false;
+      return;
+    }
+    
+    try {
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+      } else {
+        setError(null);
+        
+        // 确保之前的任何语音都被取消
+        window.speechSynthesis.cancel();
+        
+        // 播放新的语音
+        window.speechSynthesis.speak(utteranceRef.current);
+      }
+    } catch (error) {
+      console.error("语音播放错误:", error);
+      setError(error instanceof Error ? error.message : String(error));
+      if (onError) onError(error instanceof Error ? error : new Error(String(error)));
+    }
+    
+    playRequestRef.current = false;
+  }, [isSpeaking, onError, useOpenAI, text]);
+
+  // 添加专门用于首次自动播放的effect
   useEffect(() => {
+    // 在组件挂载后并且设置了autoplay时尝试播放
+    if (autoplay && text && !playedRef.current && !isSpeaking && !isLoading) {
+      console.log(`[SpeechOutput] 检测到需要首次自动播放，设置定时器`);
+      
+      // 添加一点延迟确保组件已完全渲染
+      const timer = setTimeout(() => {
+        if (playedRef.current) {
+          console.log(`[SpeechOutput] 发现已经播放过，取消自动播放`);
+          return;
+        }
+        
+        try {
+          console.log(`[SpeechOutput] 执行首次自动播放`);
+          handleSpeak();
+        } catch (err) {
+          console.error(`[SpeechOutput] 首次自动播放失败:`, err);
+        }
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [autoplay, text, isSpeaking, isLoading, handleSpeak]);
+
+  // 当文本变化时触发自动播放，添加防抖功能
+  useEffect(() => {
+    console.log(`[SpeechOutput] 检查自动播放条件: 
+      文本=${!!text}, 
+      autoplay=${autoplay}, 
+      isSpeaking=${isSpeaking}, 
+      disabled=${disabled}, 
+      已播放=${playedRef.current}, 
+      加载中=${isLoading},
+      请求中=${playRequestRef.current}`);
+      
     if (text && autoplay && !isSpeaking && !disabled && !playedRef.current && !isLoading && !playRequestRef.current) {
+      console.log(`[SpeechOutput] 满足自动播放条件: 文本长度=${text.length}, autoplay=${autoplay}`);
+      
+      // 尝试直接播放，不通过按钮
+      console.log("[SpeechOutput] 强制直接调用handleSpeak()进行自动播放");
+      
       // 设置标志，防止重复请求
       playRequestRef.current = true;
       
-      // 使用setTimeout来防抖，确保不会发出太多播放请求
-      const timer = setTimeout(() => {
-        if ((useOpenAI) || (!useOpenAI && utteranceRef.current)) {
-          try {
-            handleSpeak();
-          } catch (err) {
-            console.error("触发音频播放时出错:", err);
-            setError("触发音频播放失败");
-          }
-        }
-        playRequestRef.current = false;
-      }, 300);
+      // 立即调用播放函数
+      try {
+        handleSpeak();
+      } catch (err) {
+        console.error("直接触发音频播放时出错:", err);
+        setError("直接触发音频播放失败");
+      }
       
-      return () => {
-        clearTimeout(timer);
-        playRequestRef.current = false;
-      };
+      playRequestRef.current = false;
     }
-  }, [text, autoplay, isSpeaking, disabled, isLoading, useOpenAI]);
+  }, [text, autoplay, isSpeaking, disabled, isLoading, useOpenAI, handleSpeak]);
 
   // 使用OpenAI TTS API生成语音
   const handleOpenAITTS = async () => {
+    console.log(`[SpeechOutput] 开始请求OpenAI TTS, 文本长度: ${text?.length || 0}, 自动播放: ${autoplay}`);
+    
     // 尝试格式列表，如果一种格式失败会尝试下一种
     const formatOptions = ['wav', 'mp3'];
     let lastError = null;
@@ -263,8 +366,9 @@ export function SpeechOutput({
         
         // 设置事件处理程序
         audio.onplay = () => {
-          console.log("开始播放OpenAI语音（base64）");
+          console.log("[SpeechOutput] 开始播放OpenAI语音（base64）");
           setIsSpeaking(true);
+          playedRef.current = true; // 标记为已播放，确保不会重复播放
           if (onStart) onStart();
         };
         
@@ -558,66 +662,33 @@ export function SpeechOutput({
     };
   };
 
-  // 播放语音
-  const handleSpeak = useCallback(() => {
-    // 防止重复播放请求
-    if (playRequestRef.current) return;
-    playRequestRef.current = true;
+  // 注册全局处理函数使得能在控制台测试播放
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      window.__playSpeech = () => {
+        console.log('[SpeechOutput] 通过全局函数触发播放');
+        handleSpeak();
+      };
+    }
     
-    if (useOpenAI) {
-      // 如果正在播放，停止播放
-      if (isSpeaking && audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-        if (audioRef.current.src) {
-          URL.revokeObjectURL(audioRef.current.src);
-        }
-        audioRef.current = null;
-        setIsSpeaking(false);
-        playRequestRef.current = false;
-        return;
+    return () => {
+      if (typeof window !== 'undefined') {
+        // @ts-ignore
+        delete window.__playSpeech;
       }
-      
-      // 否则使用OpenAI TTS
-      handleOpenAITTS();
-      playRequestRef.current = false;
-      return;
-    }
-    
-    // 使用Web Speech API
-    if (!utteranceRef.current || typeof window === 'undefined' || !window.speechSynthesis) {
-      playRequestRef.current = false;
-      return;
-    }
-    
-    try {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-      } else {
-        setError(null);
-        
-        // 确保之前的任何语音都被取消
-        window.speechSynthesis.cancel();
-        
-        // 播放新的语音
-        window.speechSynthesis.speak(utteranceRef.current);
-      }
-    } catch (error) {
-      console.error("语音播放错误:", error);
-      setError(error instanceof Error ? error.message : String(error));
-      if (onError) onError(error instanceof Error ? error : new Error(String(error)));
-    }
-    
-    playRequestRef.current = false;
-  }, [isSpeaking, onError, useOpenAI, text]);
+    };
+  }, [handleSpeak]);
 
   // 渲染组件
   return (
     <div className="speech-output">
       {showButton && (
         <Button
-          onClick={handleSpeak}
+          onClick={() => {
+            console.log("[SpeechOutput] 语音按钮被点击");
+            handleSpeak();
+          }}
           variant="ghost"
           size="icon"
           disabled={disabled || isLoading}

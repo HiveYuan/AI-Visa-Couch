@@ -194,6 +194,29 @@ export default function InterviewChat() {
     console.log("[InterviewChat] handleSpeechSubmit 是否可用:", typeof handleSpeechSubmit === "function");
   }, []);
   
+  // 添加监听以自动触发最新消息的语音播放
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      
+      if (lastMessage.role === 'assistant') {
+        console.log('[InterviewChat] 检测到新的AI回复消息，尝试自动播放');
+        
+        // 添加延迟以确保组件已渲染
+        setTimeout(() => {
+          const speechButtons = document.querySelectorAll('.speech-output button');
+          if (speechButtons.length > 0) {
+            const lastSpeechButton = speechButtons[speechButtons.length - 1] as HTMLButtonElement;
+            console.log('[InterviewChat] 找到语音按钮，手动触发点击');
+            lastSpeechButton.click();
+          } else {
+            console.log('[InterviewChat] 未找到语音按钮');
+          }
+        }, 500);
+      }
+    }
+  }, [messages.length]);
+  
   // 开始面试
   const startInterview = async () => {
     setIsLoading(true);
@@ -378,28 +401,13 @@ export default function InterviewChat() {
         analysis: analysis
       };
       
+      // 添加消息并设置最新AI回复
+      console.log("[InterviewChat] 添加AI回复消息，内容长度:", question.length);
       setMessages([...newMessages, assistantMessage]);
       setLastAssistantMessage(question);
       
-      // 添加延迟以确保DOM完全更新后触发自动播放
-      setTimeout(() => {
-        try {
-          // 尝试查找并播放声音
-          const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
-          if (speechButton) {
-            console.log("Found the speech button for the latest AI reply, preparing to auto-play");
-            // 添加更多延迟以确保组件完全装载
-            setTimeout(() => {
-              speechButton.click();
-              console.log("Triggered voice auto-play");
-            }, 200);
-          } else {
-            console.log("Auto-play button not found, DOM may not be fully updated");
-          }
-        } catch (err) {
-          console.error("Error triggering voice playback:", err);
-        }
-      }, 800);
+      // 不再需要手动触发自动播放，React组件会自己处理
+      console.log("[InterviewChat] 添加了AI回复消息，等待React更新后自动播放语音");
       
     } catch (error) {
       console.error("发送消息时出错:", error);
@@ -529,28 +537,13 @@ export default function InterviewChat() {
             analysis: analysis
           };
           
+          // 添加消息并设置最新AI回复
+          console.log("[InterviewChat] 添加AI回复消息，内容长度:", question.length);
           setMessages([...newMessages, assistantMessage]);
           setLastAssistantMessage(question);
           
-          // 添加延迟以确保DOM完全更新后触发自动播放
-          setTimeout(() => {
-            try {
-              // 尝试查找并播放声音
-              const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
-              if (speechButton) {
-                console.log("Found the speech button for the latest AI reply, preparing to auto-play");
-                // 添加更多延迟以确保组件完全装载
-                setTimeout(() => {
-                  speechButton.click();
-                  console.log("Triggered voice auto-play");
-                }, 200);
-              } else {
-                console.log("Auto-play button not found, DOM may not be fully updated");
-              }
-            } catch (err) {
-              console.error("Error triggering voice playback:", err);
-            }
-          }, 800);
+          // 不再需要手动触发自动播放，React组件会自己处理
+          console.log("[InterviewChat] 添加了AI回复消息，等待React更新后自动播放语音");
         });
       })
       .catch(error => {
@@ -642,6 +635,10 @@ export default function InterviewChat() {
     const isUser = message.role === "user";
     const isLatestAssistantMessage = !isUser && index === messages.length - 1;
     
+    if (isLatestAssistantMessage) {
+      console.log(`[InterviewChat] 渲染最新AI回复消息，索引: ${index}, 自动播放: true`);
+    }
+    
     return (
       <div key={index} className={cn("flex", { "justify-end": isUser, "justify-start": !isUser })}>
         <div className="relative flex items-start">
@@ -671,6 +668,9 @@ export default function InterviewChat() {
                     language={localeLang}
                     voice={systemVoice}
                     data-auto-play={isLatestAssistantMessage}
+                    useOpenAI={true}
+                    onStart={() => console.log(`[InterviewChat] 开始播放AI回复语音: 消息索引${index}`)}
+                    onEnd={() => console.log(`[InterviewChat] 结束播放AI回复语音: 消息索引${index}`)}
                   />
                 </div>
               )}
