@@ -48,17 +48,13 @@ export function SpeechInput({
       // 设置结果回调
       newRecognizer.onResult((text, isFinal) => {
         if (isFinal) {
-          console.log("收到最终语音识别结果:", text);
+          console.log("收到语音识别结果:", text);
+          lastTextRef.current = text; // 直接使用 API 返回的完整识别文本
           onResult(text);
           setInterimText("");
           setHasRecognizedText(true); // 标记已有识别结果
-          lastTextRef.current = text; // 存储最后的文本结果
-          
-          // 使用OpenAI时，收到结果后不停止录音，让用户可以继续说话
-          if (recognizerType === 'web') {
-            setIsListening(false);
-          }
         } else {
+          // 非最终结果，只显示提示
           setInterimText(text);
         }
       });
@@ -117,6 +113,7 @@ export function SpeechInput({
         if (isStopping) return;
         
         setIsStopping(true);
+        setInterimText("正在处理录音...");
         console.log("开始停止语音识别...");
         await recognizer.stop();
         // 不在这里设置isListening和触发onSubmit
@@ -124,6 +121,7 @@ export function SpeechInput({
       } else {
         setHasRecognizedText(false); // 重置标记
         lastTextRef.current = ""; // 清空上次的文本
+        setInterimText("");
         await recognizer.start();
         setIsListening(true);
         setError(null);

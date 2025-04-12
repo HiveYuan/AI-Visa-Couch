@@ -282,7 +282,13 @@ export default function InterviewChat() {
   
   // 处理语音输入结果
   const handleSpeechResult = (text: string) => {
+    // 直接使用语音识别提供的文本，该文本已经包含了累积结果
     setInput(text);
+    
+    // 可以添加调试日志
+    if (text.length > 100) {
+      console.log(`接收到长语音输入: ${text.length}字符, 前50字符: ${text.substring(0, 50)}...`);
+    }
   };
   
   // 处理语音输入完成后的自动提交
