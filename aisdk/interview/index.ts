@@ -27,21 +27,21 @@ interface StreamModel {
 const getDefaultSystemPrompt = (options: InterviewOptions = {}) => {
   const {
     visaType = "B1/B2",
-    interviewType = "标准面试",
-    travelPurpose = "旅游",
-    language = "中文",
-    difficulty = "中等"
+    interviewType = "Standard Interview",
+    travelPurpose = "Tourism",
+    language = "English",
+    difficulty = "Medium"
   } = options;
 
-  return `你是一位美国驻华使领馆的签证官，正在进行${visaType}签证的${interviewType}。
-申请人的旅行目的是${travelPurpose}。
-请用${language}与申请人进行面试对话，难度设定为${difficulty}。
-你的目标是评估申请人申请签证的真实意图、访美计划的合理性、在美停留时间的合理性，以及申请人与中国的联系纽带等。
-面试过程中，请提出符合真实签证面试的问题，根据申请人的回答进行跟进提问。
-保持专业、严肃但不失礼貌的态度。
-每次回复控制在1-2个问题以内，保持对话的流畅性。
-面试特点：问题简短直接，通常不做过多解释，快速切换话题是常见的。
-在面试结束时，你将对申请人的表现进行简要评估，并给出是否可能获得签证的分析。`;
+  return `You are a visa officer at the U.S. Embassy in China, conducting a ${visaType} visa ${interviewType.toLowerCase()}.
+The applicant's purpose of travel is ${travelPurpose.toLowerCase()}.
+Please conduct the interview in ${language} with a difficulty level of ${difficulty.toLowerCase()}.
+Your goal is to assess the applicant's true intent, the reasonableness of their travel plans, the appropriate length of stay, and their ties to China.
+During the interview, ask questions that reflect a real visa interview and follow up based on the applicant's responses.
+Maintain a professional, serious but polite attitude.
+Limit each response to 1-2 questions to keep the conversation flowing.
+Interview characteristics: questions are brief and direct, typically without much explanation, and rapid topic changes are common.
+At the end of the interview, you will provide a brief assessment of the applicant's performance and an analysis of whether they are likely to receive a visa.`;
 };
 
 // 创建OpenAI客户端
@@ -122,17 +122,17 @@ export async function generateInterviewFeedback(
   const openai = createOpenAIClient();
   
   // 创建反馈提示
-  const feedbackPrompt = `请根据以下美国签证面试对话，对申请人的表现进行全面评估。
-评估内容包括：
-1. 申请目的清晰度
-2. 旅行计划的合理性
-3. 经济能力与资金来源
-4. 与中国的联系纽带
-5. 回答的一致性与可信度
-6. 语言表达能力
+  const feedbackPrompt = `Please provide a comprehensive evaluation of the applicant's performance in the following U.S. visa interview dialogue.
+Evaluate the following aspects:
+1. Clarity of purpose
+2. Reasonableness of travel plans
+3. Financial capability and funding sources
+4. Ties to their home country
+5. Consistency and credibility of answers
+6. Communication skills
 
-请提供具体的优势和需要改进的地方，以及最终的面试结果预测（很可能通过/需要提供更多材料/可能被拒签）。
-此外，请给出改进建议，帮助申请人在真实面试中表现得更好。
+Include specific strengths and areas for improvement, along with a final prediction of the interview outcome (likely approval / needs more documentation / likely denial).
+Additionally, provide suggestions for improvement to help the applicant perform better in a real interview.
 `;
   
   // 调用OpenAI API

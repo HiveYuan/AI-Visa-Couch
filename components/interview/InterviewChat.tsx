@@ -24,33 +24,33 @@ type InterviewOptions = {
 
 // 预设的签证类型选项
 const VISA_TYPES = [
-  "B1/B2 (商务/旅游签证)",
-  "F1 (学生签证)",
-  "J1 (交流访问学者)",
-  "H1B (工作签证)",
-  "L1 (跨国公司内部调动)",
-  "O1 (特殊人才签证)",
+  "B1/B2 (Business/Tourism Visa)",
+  "F1 (Student Visa)",
+  "J1 (Exchange Visitor)",
+  "H1B (Work Visa)",
+  "L1 (Intracompany Transfer)",
+  "O1 (Extraordinary Ability)",
 ];
 
 const INTERVIEW_TYPES = [
-  "标准面试",
-  "严格审查",
-  "快速面试",
-  "深入询问",
+  "Standard Interview",
+  "Strict Review",
+  "Quick Interview",
+  "In-depth Inquiry",
 ];
 
 const TRAVEL_PURPOSES = [
-  "旅游",
-  "探亲",
-  "商务",
-  "学习",
-  "学术交流",
-  "短期工作",
-  "会议",
-  "医疗",
+  "Tourism",
+  "Family Visit",
+  "Business",
+  "Study",
+  "Academic Exchange",
+  "Short-term Work",
+  "Conference",
+  "Medical Treatment",
 ];
 
-const DIFFICULTY_LEVELS = ["简单", "中等", "困难", "极具挑战"];
+const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard", "Challenging"];
 
 // 处理流式响应的函数
 async function handleStreamResponse(
@@ -62,13 +62,13 @@ async function handleStreamResponse(
 ) {
   if (!response.ok) {
     const errorText = await response.text();
-    setErrorFn(`请求失败: ${response.status} ${errorText}`);
+    setErrorFn(`Request failed: ${response.status} ${errorText}`);
     return;
   }
   
   const reader = response.body?.getReader();
   if (!reader) {
-    setErrorFn("无法读取响应流");
+    setErrorFn("Unable to read response stream");
     return;
   }
   
@@ -84,7 +84,7 @@ async function handleStreamResponse(
       if (value) {
         const chunk = decoder.decode(value, { stream: true });
         
-        // 解析流式数据（可能包含多个JSON）
+        // Parse streaming data (may contain multiple JSON)
         const parts = chunk.split("\n");
         for (const part of parts) {
           if (part.trim()) {
@@ -92,7 +92,7 @@ async function handleStreamResponse(
               const data = JSON.parse(part);
               if (data.type === "text" && data.value) {
                 text += data.value;
-                // 更新回复内容
+                // Update reply content
                 const assistantMessage: Message = { 
                   role: "assistant", 
                   content: text 
@@ -100,48 +100,48 @@ async function handleStreamResponse(
                 updateMessagesFn([...initialMessages, assistantMessage]);
               }
             } catch (e) {
-              // 忽略非JSON数据或解析错误
-              console.log("解析响应数据错误:", part, e);
+              // Ignore non-JSON data or parsing errors
+              console.log("Error parsing response data:", part, e);
             }
           }
         }
       }
     }
     
-    // 确保最终消息被设置
+    // Ensure final message is set
     const assistantMessage: Message = { 
       role: "assistant", 
       content: text 
     };
     updateMessagesFn([...initialMessages, assistantMessage]);
     
-    // 如果提供了设置最后消息的函数，更新最后的AI回复
+    // If a function to set the last message is provided, update the latest AI reply
     if (setLastMessageFn && text) {
       setLastMessageFn(text);
       
-      // 增加延迟时间，确保DOM完全更新后再触发自动播放
+      // Add delay to ensure DOM is fully updated before triggering auto-play
       setTimeout(() => {
         try {
-          // 尝试查找并播放语音
+          // Try to find and play voice
           const speechButton = document.querySelector('[data-auto-play="true"]') as HTMLElement;
           if (speechButton) {
-            console.log("找到最新AI回复的语音按钮，准备自动播放");
-            // 再增加一点延迟，确保组件完全挂载
+            console.log("Found the speech button for the latest AI reply, preparing to auto-play");
+            // Add a bit more delay to ensure component is fully mounted
             setTimeout(() => {
               speechButton.click();
-              console.log("触发了语音自动播放");
+              console.log("Triggered voice auto-play");
             }, 200);
           } else {
-            console.log("未找到自动播放按钮，可能DOM还未完全更新");
+            console.log("Auto-play button not found, DOM may not be fully updated");
           }
         } catch (err) {
-          console.error("触发语音播放时出错:", err);
+          console.error("Error triggering voice playback:", err);
         }
       }, 800);
     }
   } catch (error) {
-    console.error("处理流式响应时出错:", error);
-    setErrorFn(`处理响应时出错: ${error instanceof Error ? error.message : String(error)}`);
+    console.error("Error processing streaming response:", error);
+    setErrorFn(`Error processing response: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -188,15 +188,15 @@ export default function InterviewChat() {
     // 系统提示消息（不显示给用户）
     const systemMessage: Message = {
       role: "system",
-      content: `你是一位美国驻华使领馆的签证官，正在进行${actualVisaType}签证的${interviewType}。
-申请人的旅行目的是${travelPurpose}。
-请用中文与申请人进行面试对话，难度设定为${difficulty}。
-你的目标是评估申请人申请签证的真实意图、访美计划的合理性、在美停留时间的合理性，以及申请人与中国的联系纽带等。
-面试过程中，请提出符合真实签证面试的问题，根据申请人的回答进行跟进提问。
-保持专业、严肃但不失礼貌的态度。
-每次回复控制在1-2个问题以内，保持对话的流畅性。
-面试特点：问题简短直接，通常不做过多解释，快速切换话题是常见的。
-在面试结束时，你将对申请人的表现进行简要评估，并给出是否可能获得签证的分析。`,
+      content: `You are a visa officer at the U.S. Embassy in China, conducting a ${actualVisaType} visa ${interviewType.toLowerCase()}.
+The applicant's purpose of travel is ${travelPurpose.toLowerCase()}.
+Please conduct the interview in English with a difficulty level of ${difficulty.toLowerCase()}.
+Your goal is to assess the applicant's true intent, the reasonableness of their travel plans, the appropriate length of stay, and their ties to China.
+During the interview, ask questions that reflect a real visa interview and follow up based on the applicant's responses.
+Maintain a professional, serious but polite attitude.
+Limit each response to 1-2 questions to keep the conversation flowing.
+Interview characteristics: questions are brief and direct, typically without much explanation, and rapid topic changes are common.
+At the end of the interview, you will provide a brief assessment of the applicant's performance and an analysis of whether they are likely to receive a visa.`,
     };
     
     // 设置初始消息
@@ -361,13 +361,14 @@ export default function InterviewChat() {
             interviewType,
             travelPurpose,
             difficulty,
+            language: "en" // 设置语言为英文
           },
         }),
       });
       
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`获取反馈失败: ${response.status} ${errorText}`);
+        throw new Error(`Feedback request failed: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
@@ -375,11 +376,11 @@ export default function InterviewChat() {
         setFeedback(data.data.feedback);
         setShowFeedback(true);
       } else {
-        throw new Error("反馈数据无效");
+        throw new Error("Invalid feedback data");
       }
     } catch (error) {
-      console.error("获取面试反馈时出错:", error);
-      setError(`获取反馈时出错: ${error instanceof Error ? error.message : String(error)}`);
+      console.error("Error getting interview feedback:", error);
+      setError(`Error getting feedback: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsFeedbackLoading(false);
     }
@@ -412,7 +413,7 @@ export default function InterviewChat() {
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="请输入您的回答..."
+          placeholder="Type your answer..."
           disabled={isLoading || !isStarted}
           className="flex-1"
         />
@@ -421,10 +422,11 @@ export default function InterviewChat() {
           onSubmit={handleSpeechSubmit}
           disabled={isLoading || !isStarted}
           recognizerType="openai"
+          language="en"
           autoSubmit={true}
         />
         <Button type="submit" disabled={isLoading || !isStarted || !input.trim()}>
-          发送
+          Send
         </Button>
       </form>
     );
@@ -447,7 +449,7 @@ export default function InterviewChat() {
           {isAssistant && (
             <Avatar className="mt-1">
               <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-                签证官
+                VO
               </div>
             </Avatar>
           )}
@@ -470,8 +472,8 @@ export default function InterviewChat() {
                   text={message.content}
                   autoplay={isLatestAssistantMsg}
                   useOpenAI={true}
-                  voice="nova" // 使用nova声音，适合中文发音的女性声音
-                  language="zh"
+                  voice="alloy" 
+                  language="en"
                 />
               </div>
             )}
@@ -479,7 +481,7 @@ export default function InterviewChat() {
           {message.role === "user" && (
             <Avatar className="mt-1">
               <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center font-semibold">
-                您
+                You
               </div>
             </Avatar>
           )}
@@ -488,158 +490,165 @@ export default function InterviewChat() {
     );
   };
   
-  return (
-    <div className="flex flex-col h-[calc(100vh-16rem)]">
-      {/* 面试配置选择区 */}
-      {!isStarted && (
-        <div className="mb-4 p-4 bg-muted/50 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">面试设置</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">签证类型</label>
-              <Select value={visaType} onValueChange={setVisaType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择签证类型" />
-                </SelectTrigger>
-                <SelectContent>
-                  {VISA_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">面试类型</label>
-              <Select value={interviewType} onValueChange={setInterviewType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择面试类型" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INTERVIEW_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">旅行目的</label>
-              <Select value={travelPurpose} onValueChange={setTravelPurpose}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择旅行目的" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TRAVEL_PURPOSES.map((purpose) => (
-                    <SelectItem key={purpose} value={purpose}>
-                      {purpose}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">难度级别</label>
-              <Select value={difficulty} onValueChange={setDifficulty}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择难度级别" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DIFFICULTY_LEVELS.map((level) => (
-                    <SelectItem key={level} value={level}>
-                      {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+  // 渲染配置表单
+  const renderConfigForm = () => {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Visa Interview Simulator</h2>
+        <p className="text-muted-foreground">Configure your interview settings below.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Visa Type</label>
+            <Select value={visaType} onValueChange={setVisaType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select visa type" />
+              </SelectTrigger>
+              <SelectContent>
+                {VISA_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Interview Type</label>
+            <Select value={interviewType} onValueChange={setInterviewType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select interview type" />
+              </SelectTrigger>
+              <SelectContent>
+                {INTERVIEW_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Travel Purpose</label>
+            <Select value={travelPurpose} onValueChange={setTravelPurpose}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select travel purpose" />
+              </SelectTrigger>
+              <SelectContent>
+                {TRAVEL_PURPOSES.map((purpose) => (
+                  <SelectItem key={purpose} value={purpose}>
+                    {purpose}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Difficulty Level</label>
+            <Select value={difficulty} onValueChange={setDifficulty}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                {DIFFICULTY_LEVELS.map((level) => (
+                  <SelectItem key={level} value={level}>
+                    {level}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        <Button 
+          onClick={startInterview} 
+          disabled={isLoading}
+          className="w-full"
+        >
+          {isLoading ? "Starting Interview..." : "Start Interview"}
+        </Button>
+      </div>
+    );
+  };
+
+  // 渲染面试头部
+  const renderInterviewHeader = () => {
+    return (
+      <div className="flex justify-between items-center border-b pb-4 mb-4">
+        <div>
+          <h2 className="text-xl font-bold">
+            {visaType.split(" ")[0]} Visa Interview
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Purpose: {travelPurpose} | Type: {interviewType} | Difficulty: {difficulty}
+          </p>
+        </div>
+        
+        <div className="flex gap-2">
           <Button 
-            onClick={startInterview} 
-            disabled={isLoading} 
-            className="w-full mt-4"
+            variant="outline" 
+            size="sm" 
+            onClick={resetInterview}
+            disabled={isLoading}
           >
-            {isLoading ? "初始化中..." : "开始面试"}
+            Reset
           </Button>
           
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={getFeedback}
+            disabled={isLoading || isFeedbackLoading || messages.length < 3}
+          >
+            {isFeedbackLoading ? "Getting Feedback..." : "Get Feedback"}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="container max-w-4xl mx-auto py-6 space-y-8">
+      {!isStarted ? (
+        renderConfigForm()
+      ) : (
+        <>
+          {renderInterviewHeader()}
+          
+          <div className="space-y-4 mb-4 max-h-[60vh] overflow-y-auto p-4 border rounded-lg">
+            {messages.filter(m => m.role !== "system").map((message, index) => 
+              renderMessage(message, index)
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+          
           {error && (
-            <div className="mt-4 p-2 bg-red-50 border border-red-200 text-red-600 rounded">
+            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
               {error}
             </div>
           )}
-        </div>
+          
+          {renderChatForm()}
+        </>
       )}
       
-      {/* 聊天区 */}
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-        {messages.filter(msg => msg.role !== "system").map((message, i) => 
-          renderMessage(message, i)
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      
-      {/* 输入区域 */}
-      {isStarted && renderChatForm()}
-      
-      {/* 操作按钮 */}
-      {isStarted && (
-        <div className="flex justify-center gap-4 mt-4">
-          <Button
-            variant="outline"
-            onClick={() => setShowFeedback(true)}
-            disabled={messages.length < 3 || isFeedbackLoading}
-          >
-            获取面试反馈
-          </Button>
-          <Button variant="outline" onClick={resetInterview}>
-            重新开始
-          </Button>
-        </div>
-      )}
-      
-      {/* 反馈对话框 */}
       <Dialog open={showFeedback} onOpenChange={setShowFeedback}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>面试表现反馈</DialogTitle>
+            <DialogTitle>Interview Feedback</DialogTitle>
             <DialogDescription>
-              以下是基于您当前面试对话的分析与建议
+              Analysis of your interview performance
             </DialogDescription>
           </DialogHeader>
-          
-          {isFeedbackLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="ml-2">分析中...</span>
-            </div>
-          ) : feedback ? (
-            <div className="space-y-4 py-4">
-              <div className="prose dark:prose-invert max-w-none">
-                {feedback.split("\n").map((paragraph, i) => (
-                  <p key={i}>{paragraph}</p>
-                ))}
-              </div>
-              <Button 
-                onClick={closeFeedbackDialog} 
-                className="w-full"
-              >
-                关闭
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <Button onClick={getFeedback}>获取详细反馈</Button>
-              <p className="text-sm text-muted-foreground">
-                点击按钮获取基于当前对话的详细反馈和建议
-              </p>
-            </div>
-          )}
+          <div className="prose prose-sm mt-4 max-w-none">
+            {feedback.split('\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+          <Button onClick={closeFeedbackDialog} className="mt-4">Close</Button>
         </DialogContent>
       </Dialog>
     </div>

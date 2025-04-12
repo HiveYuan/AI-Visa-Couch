@@ -6,35 +6,35 @@ import { createSpeechRecognizer, SpeechRecognizer } from "@/aisdk/speech";
 import { Mic, MicOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// 定义组件属性
+// Define component props
 interface SpeechInputProps {
   onResult: (text: string) => void;
-  onSubmit?: () => void; // 添加自动提交回调
+  onSubmit?: () => void; // Callback for auto-submit
   recognizerType?: 'web' | 'openai';
   apiKey?: string;
   language?: string;
   disabled?: boolean;
-  autoSubmit?: boolean; // 是否在麦克风关闭时自动提交
+  autoSubmit?: boolean; // Whether to auto-submit when microphone is closed
 }
 
 export function SpeechInput({
   onResult,
   onSubmit,
-  recognizerType = 'openai', // 默认使用OpenAI
+  recognizerType = 'openai', // Default to using OpenAI
   apiKey,
-  language = 'zh-CN',
+  language = 'en-US', // Default to English
   disabled = false,
-  autoSubmit = true // 默认启用自动提交
+  autoSubmit = true // Default enable auto-submit
 }: SpeechInputProps) {
   const [isListening, setIsListening] = useState(false);
   const [recognizer, setRecognizer] = useState<SpeechRecognizer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [interimText, setInterimText] = useState("");
   const [hasRecognizedText, setHasRecognizedText] = useState(false);
-  const [isStopping, setIsStopping] = useState(false); // 跟踪是否正在停止过程中
-  const lastTextRef = useRef<string>(""); // 存储最后识别的文本
+  const [isStopping, setIsStopping] = useState(false); // Track if we're in the stopping process
+  const lastTextRef = useRef<string>(""); // Store the last recognized text
 
-  // 初始化语音识别器
+  // Initialize speech recognizer
   useEffect(() => {
     try {
       const config = {
@@ -42,99 +42,99 @@ export function SpeechInput({
         language
       };
 
-      // 创建语音识别器
+      // Create speech recognizer
       const newRecognizer = createSpeechRecognizer(recognizerType, config);
       
-      // 设置结果回调
+      // Set result callback
       newRecognizer.onResult((text, isFinal) => {
         if (isFinal) {
-          console.log("收到语音识别结果:", text);
-          lastTextRef.current = text; // 直接使用 API 返回的完整识别文本
+          console.log("Received speech recognition result:", text);
+          lastTextRef.current = text; // Directly use API's complete recognition text
           onResult(text);
           setInterimText("");
-          setHasRecognizedText(true); // 标记已有识别结果
+          setHasRecognizedText(true); // Mark that we have recognized text
         } else {
-          // 非最终结果，只显示提示
+          // Non-final result, just show prompt
           setInterimText(text);
         }
       });
       
-      // 设置错误回调
+      // Set error callback
       newRecognizer.onError((error) => {
-        console.error("语音识别错误:", error);
+        console.error("Speech recognition error:", error);
         setError(error.message);
         setIsListening(false);
         setIsStopping(false);
       });
       
-      // 设置停止回调
+      // Set stopped callback
       newRecognizer.onStopped(() => {
-        console.log("语音识别已完全停止");
+        console.log("Speech recognition fully stopped");
         setIsListening(false);
         setIsStopping(false);
         
-        // 在停止录音后，如果启用了自动提交，则触发提交
+        // After stopping recording, if auto-submit is enabled, trigger submission
         if (autoSubmit && onSubmit) {
-          // 确保有识别结果才提交
+          // Ensure we have recognized text before submitting
           if (hasRecognizedText && lastTextRef.current.trim()) {
-            console.log("语音识别完全停止，自动提交最后结果:", lastTextRef.current);
-            // 使用setTimeout确保状态更新后再提交
+            console.log("Speech recognition fully stopped, auto-submitting last result:", lastTextRef.current);
+            // Use setTimeout to ensure state is updated before submitting
             setTimeout(() => {
               onSubmit();
             }, 0);
-            setHasRecognizedText(false); // 重置标记
+            setHasRecognizedText(false); // Reset flag
           } else {
-            console.log("语音识别完全停止，但没有识别到文本，不提交");
+            console.log("Speech recognition fully stopped, but no text was recognized, not submitting");
           }
         }
       });
       
       setRecognizer(newRecognizer);
       
-      // 清理函数
+      // Cleanup function
       return () => {
         if (newRecognizer.isListening()) {
           newRecognizer.stop().catch(console.error);
         }
       };
     } catch (error) {
-      console.error("初始化语音识别器错误:", error);
+      console.error("Error initializing speech recognizer:", error);
       setError(error instanceof Error ? error.message : String(error));
     }
   }, [recognizerType, apiKey, language, onResult, autoSubmit, onSubmit]);
 
-  // 切换语音识别开关
+  // Toggle speech recognition
   const toggleListening = useCallback(async () => {
     if (!recognizer) return;
     
     try {
       if (isListening) {
-        // 防止重复停止
+        // Prevent duplicate stops
         if (isStopping) return;
         
         setIsStopping(true);
-        setInterimText("正在处理录音...");
-        console.log("开始停止语音识别...");
+        setInterimText("Processing recording...");
+        console.log("Starting to stop speech recognition...");
         await recognizer.stop();
-        // 不在这里设置isListening和触发onSubmit
-        // 这将在onStopped回调中完成
+        // Don't set isListening and trigger onSubmit here
+        // This will be done in the onStopped callback
       } else {
-        setHasRecognizedText(false); // 重置标记
-        lastTextRef.current = ""; // 清空上次的文本
+        setHasRecognizedText(false); // Reset flag
+        lastTextRef.current = ""; // Clear previous text
         setInterimText("");
         await recognizer.start();
         setIsListening(true);
         setError(null);
       }
     } catch (error) {
-      console.error("切换语音识别状态错误:", error);
+      console.error("Error toggling speech recognition state:", error);
       setError(error instanceof Error ? error.message : String(error));
       setIsListening(false);
       setIsStopping(false);
     }
   }, [recognizer, isListening, isStopping]);
 
-  // 渲染组件
+  // Render component
   return (
     <TooltipProvider>
       <Tooltip>
@@ -147,7 +147,7 @@ export function SpeechInput({
               variant={isListening ? "destructive" : "outline"}
               size="icon"
               className="rounded-full h-10 w-10"
-              title={isListening ? "停止语音输入" : "开始语音输入"}
+              title={isListening ? "Stop voice input" : "Start voice input"}
             >
               {isListening ? <MicOff size={18} /> : <Mic size={18} />}
             </Button>
@@ -160,24 +160,24 @@ export function SpeechInput({
             
             {isStopping && (
               <div className="absolute bottom-full mb-2 p-2 bg-amber-600 text-white rounded-md text-sm min-w-48 max-w-96">
-                处理中...
+                Processing...
               </div>
             )}
             
             {error && (
               <div className="absolute bottom-full mb-2 p-2 bg-red-600 text-white rounded-md text-sm min-w-48 max-w-96">
-                错误: {error}
+                Error: {error}
               </div>
             )}
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{isListening ? "点击停止语音输入" : "开始语音输入"}</p>
+          <p>{isListening ? "Click to stop voice input" : "Start voice input"}</p>
           {isListening && recognizerType === 'openai' && (
-            <p className="text-xs mt-1">持续收听中 - 说完后点击停止</p>
+            <p className="text-xs mt-1">Listening continuously - click stop when finished</p>
           )}
           {autoSubmit && (
-            <p className="text-xs mt-1">停止后将自动发送文本</p>
+            <p className="text-xs mt-1">Will auto-send text after stopping</p>
           )}
         </TooltipContent>
       </Tooltip>

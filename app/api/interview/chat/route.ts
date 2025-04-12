@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     
     // 验证输入
     if (!Array.isArray(messages) || messages.length === 0) {
-      return respErr("无效的消息格式");
+      return respErr("Invalid message format");
     }
     
     // 直接返回流式响应
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       options as InterviewOptions
     );
   } catch (error) {
-    console.error("面试对话API错误:", error);
-    return respErr("处理面试对话时出错");
+    console.error("Interview API error:", error);
+    return respErr("Error processing interview chat");
   }
 } 
