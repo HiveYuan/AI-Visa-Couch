@@ -30,4 +30,6 @@ alwaysApply: true
 
 6. .env.development
 
+7. [api_doc.md](mdc:api_doc.md)
+
 
