@@ -2,13 +2,12 @@ import React from 'react';
 import { createTranslator } from 'next-intl';
 import ClientComponent from './client';
 
-interface Props {
-  params: { locale: string };
-}
-
-export default async function AIVideoChatPage(props: Props) {
-  const { params } = props;
-  const locale = params.locale;
+export default async function AIVideoChatPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const messages = (await import(`@/i18n/messages/${locale}.json`)).default;
   const t = createTranslator({ locale, messages, namespace: 'AIVideoChat' });
   
