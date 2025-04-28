@@ -6,7 +6,9 @@ interface Props {
   params: { locale: string };
 }
 
-export default async function AIVideoChatPage({ params: { locale } }: Props) {
+export default async function AIVideoChatPage(props: Props) {
+  const { params } = props;
+  const locale = params.locale;
   const messages = (await import(`@/i18n/messages/${locale}.json`)).default;
   const t = createTranslator({ locale, messages, namespace: 'AIVideoChat' });
   

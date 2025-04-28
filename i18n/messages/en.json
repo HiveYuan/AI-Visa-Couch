@@ -4,6 +4,10 @@
     "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups, Ship Fast with a variety of templates and components.",
     "keywords": "ShipAny, AI SaaS Boilerplate, NextJS Boilerplate"
   },
+  "AIVideoChat": {
+    "title": "AI Video Chat",
+    "description": "Real-time video conversation with virtual avatar"
+  },
   "user": {
     "sign_in": "Sign In",
     "sign_out": "Sign Out",

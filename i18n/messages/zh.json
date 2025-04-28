@@ -4,6 +4,10 @@
     "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板，提供各种模板和组件，帮助您快速启动。",
     "keywords": "ShipAny, AI SaaS 模板, NextJS 模板"
   },
+  "AIVideoChat": {
+    "title": "AI 视频对话",
+    "description": "与虚拟人进行实时视频对话"
+  },
   "user": {
     "sign_in": "登录",
     "sign_out": "退出登录",

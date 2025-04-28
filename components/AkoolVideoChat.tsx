@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import AgoraRTC, { IAgoraRTCClient, IAgoraRTCRemoteUser, ILocalAudioTrack } from 'agora-rtc-sdk-ng';
+// 将Agora SDK的导入移到组件内部以解决SSR问题
 import { AkoolService, AkoolSessionCreateResponse } from '@/services/akool';
 
 interface AkoolVideoChatProps {
@@ -17,16 +17,40 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   const [isSending, setIsSending] = useState(false);
   const [responseText, setResponseText] = useState('');
   
-  const agoraClient = useRef<IAgoraRTCClient | null>(null);
-  const localAudioTrack = useRef<ILocalAudioTrack | null>(null);
-  const remoteUserRef = useRef<IAgoraRTCRemoteUser | null>(null);
+  const agoraClient = useRef<any>(null);
+  const localAudioTrack = useRef<any>(null);
+  const remoteUserRef = useRef<any>(null);
   const videoRef = useRef<HTMLDivElement>(null);
   const akoolServiceRef = useRef<AkoolService | null>(null);
   const messageIdCounterRef = useRef(0);
+  const AgoraRTCRef = useRef<any>(null);
 
-  // 初始化Akool服务
+  // 初始化Akool服务和加载AgoraRTC
   useEffect(() => {
     akoolServiceRef.current = new AkoolService(apiToken);
+    
+    // 动态导入AgoraRTC SDK以避免SSR问题
+    let AgoraRTC: any = null;
+    const loadAgoraRTC = async () => {
+      try {
+        // 仅在客户端导入AgoraRTC
+        if (typeof window !== 'undefined') {
+          const agoraModule = await import('agora-rtc-sdk-ng');
+          AgoraRTC = agoraModule.default;
+          AgoraRTCRef.current = AgoraRTC;
+          
+          // 导入成功后初始化会话
+          if (akoolServiceRef.current) {
+            initSession(AgoraRTC);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load Agora SDK:', err);
+        setError('加载SDK失败');
+      }
+    };
+    
+    loadAgoraRTC();
     
     // 组件卸载时清理
     return () => {
@@ -38,33 +62,29 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   }, [apiToken]);
 
   // 创建会话并加入通话
-  useEffect(() => {
-    const initSession = async () => {
-      if (!akoolServiceRef.current) return;
-      
-      try {
-        setLoading(true);
-        
-        // 创建Akool会话
-        const sessionData = await akoolServiceRef.current.createSession(avatarId);
-        setSession(sessionData);
-        
-        // 初始化Agora客户端
-        await initAgoraClient(sessionData);
-        
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to initialize session:', err);
-        setError('初始化会话失败，请刷新页面重试');
-        setLoading(false);
-      }
-    };
+  const initSession = async (AgoraRTC: any) => {
+    if (!akoolServiceRef.current || !AgoraRTC) return;
     
-    initSession();
-  }, [avatarId]);
+    try {
+      setLoading(true);
+      
+      // 创建Akool会话
+      const sessionData = await akoolServiceRef.current.createSession(avatarId);
+      setSession(sessionData);
+      
+      // 初始化Agora客户端
+      await initAgoraClient(sessionData, AgoraRTC);
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to initialize session:', err);
+      setError('初始化会话失败，请刷新页面重试');
+      setLoading(false);
+    }
+  };
 
   // 初始化Agora客户端
-  const initAgoraClient = async (sessionData: AkoolSessionCreateResponse) => {
+  const initAgoraClient = async (sessionData: AkoolSessionCreateResponse, AgoraRTC: any) => {
     try {
       // 创建Agora客户端
       agoraClient.current = AgoraRTC.createClient({
@@ -101,7 +121,7 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   };
 
   // 处理远程用户发布流
-  const handleUserPublished = async (user: IAgoraRTCRemoteUser, mediaType: 'audio' | 'video') => {
+  const handleUserPublished = async (user: any, mediaType: 'audio' | 'video') => {
     try {
       // 订阅远程用户
       await agoraClient.current?.subscribe(user, mediaType);
@@ -128,7 +148,7 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   };
 
   // 处理远程用户取消发布流
-  const handleUserUnpublished = (user: IAgoraRTCRemoteUser) => {
+  const handleUserUnpublished = (user: any) => {
     if (remoteUserRef.current?.uid === user.uid) {
       remoteUserRef.current = null;
     }
