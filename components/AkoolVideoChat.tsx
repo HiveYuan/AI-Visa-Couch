@@ -1,32 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-// 使用动态导入AgoraRTC，避免服务器渲染时的window错误
+import AgoraRTC, { IAgoraRTCClient, IAgoraRTCRemoteUser, ILocalAudioTrack } from 'agora-rtc-sdk-ng';
 import { AkoolService, AkoolSessionCreateResponse } from '@/services/akool';
-
-// 定义接口但不直接导入库
-interface IAgoraRTCClient {
-  join: (appId: string, channel: string, token: string, uid: number) => Promise<any>;
-  publish: (tracks: any[]) => Promise<void>;
-  on: (event: string, callback: any) => void;
-  subscribe: (user: any, mediaType: string) => Promise<void>;
-  leave: () => Promise<void>;
-  sendStreamMessage: (data: Uint8Array | string, reliable: boolean) => Promise<void>;
-}
-
-interface IAgoraRTCRemoteUser {
-  uid: string | number;
-  audioTrack?: {
-    play: () => void;
-  };
-  videoTrack?: {
-    play: (element: HTMLElement) => void;
-  };
-}
-
-interface ILocalAudioTrack {
-  close: () => void;
-}
 
 interface AkoolVideoChatProps {
   apiToken: string;
@@ -40,7 +16,6 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [responseText, setResponseText] = useState('');
-  const [AgoraRTC, setAgoraRTC] = useState<any>(null);
   
   const agoraClient = useRef<IAgoraRTCClient | null>(null);
   const localAudioTrack = useRef<ILocalAudioTrack | null>(null);
@@ -48,13 +23,6 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   const videoRef = useRef<HTMLDivElement>(null);
   const akoolServiceRef = useRef<AkoolService | null>(null);
   const messageIdCounterRef = useRef(0);
-
-  // 动态导入Agora SDK
-  useEffect(() => {
-    import('agora-rtc-sdk-ng').then(module => {
-      setAgoraRTC(module.default);
-    });
-  }, []);
 
   // 初始化Akool服务
   useEffect(() => {
@@ -67,13 +35,10 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
       }
       leaveCall();
     };
-  }, [apiToken, session]);
+  }, [apiToken]);
 
   // 创建会话并加入通话
   useEffect(() => {
-    // 确保AgoraRTC已加载并且akoolService已初始化
-    if (!AgoraRTC || !akoolServiceRef.current) return;
-    
     const initSession = async () => {
       if (!akoolServiceRef.current) return;
       
@@ -96,20 +61,16 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
     };
     
     initSession();
-  }, [AgoraRTC, avatarId]);
+  }, [avatarId]);
 
   // 初始化Agora客户端
   const initAgoraClient = async (sessionData: AkoolSessionCreateResponse) => {
-    if (!AgoraRTC) return;
-    
     try {
       // 创建Agora客户端
       agoraClient.current = AgoraRTC.createClient({
         mode: 'rtc',
         codec: 'vp8'
       });
-      
-      if (!agoraClient.current) return;
       
       // 注册用户加入和离开的回调
       agoraClient.current.on('user-published', handleUserPublished);
@@ -130,10 +91,7 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
       
       // 创建并发布本地音频轨道
       localAudioTrack.current = await AgoraRTC.createMicrophoneAudioTrack();
-      
-      if (agoraClient.current && localAudioTrack.current) {
-        await agoraClient.current.publish([localAudioTrack.current]);
-      }
+      await agoraClient.current.publish([localAudioTrack.current]);
       
       console.log('Joined Agora channel successfully');
     } catch (err) {
@@ -146,10 +104,8 @@ export default function AkoolVideoChat({ apiToken, avatarId = 'dvp_Tristan_cloth
   const handleUserPublished = async (user: IAgoraRTCRemoteUser, mediaType: 'audio' | 'video') => {
     try {
       // 订阅远程用户
-      if (agoraClient.current) {
-        await agoraClient.current.subscribe(user, mediaType);
-        console.log('Subscribed to remote user:', user.uid);
-      }
+      await agoraClient.current?.subscribe(user, mediaType);
+      console.log('Subscribed to remote user:', user.uid);
       
       remoteUserRef.current = user;
       

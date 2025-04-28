@@ -65,7 +65,8 @@ export class AkoolService {
   }
 
   // 创建会话
-  async createSession(avatar_id: string, duration = 60): Promise<AkoolSessionCreateResponse> {
+  async createSession(avatar_id: string, duration = 180): Promise<AkoolSessionCreateResponse> {
+    duration = 180;
     try {
       const response = await axios.post(
         `${AKOOL_API_BASE_URL}/v4/liveAvatar/session/create`,
