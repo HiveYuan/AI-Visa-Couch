@@ -1,593 +1,1459 @@
-[Jump to Content](https://docs.heygen.com/docs/<#content>)
-[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/docs/</>)
-[Home](https://docs.heygen.com/docs/</>)[Documentation](https://docs.heygen.com/docs/</docs>)[API Reference](https://docs.heygen.com/docs/</reference>)[Updates](https://docs.heygen.com/docs/</changelog>)[Discussions](https://docs.heygen.com/docs/</discuss>)[Tools](https://docs.heygen.com/docs/</page/tools>)[Community](https://docs.heygen.com/docs/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/docs/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/docs/</login?redirect_uri=/docs/streaming-avatar-sdk-reference>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/docs/</>)
-Documentation
-[Log In](https://docs.heygen.com/docs/</login?redirect_uri=/docs/streaming-avatar-sdk-reference>)
+# HeyGen API 文档
+
+## https://docs.heygen.com/reference/new-session
+
+[Jump to Content](https://docs.heygen.com/reference/<#content>)
+[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/new-session>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+API Reference
+[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/new-session>)
 Moon (Dark Mode)Sun (Light Mode)
 v4.0.8
-[Home](https://docs.heygen.com/docs/</>)[Documentation](https://docs.heygen.com/docs/</docs>)[API Reference](https://docs.heygen.com/docs/</reference>)[Updates](https://docs.heygen.com/docs/</changelog>)[Discussions](https://docs.heygen.com/docs/</discuss>)[Tools](https://docs.heygen.com/docs/</page/tools>)[Community](https://docs.heygen.com/docs/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/docs/<https:/help.heygen.com/en/>)Streaming Avatar SDK API Reference
-## Getting Started
-  * [Quick Start](https://docs.heygen.com/docs/</docs/quick-start>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)New Session
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
 
 
-## Generate and translate videos
-  * [Create Avatar Videos](https://docs.heygen.com/docs/</docs/create-video>)
-    * [Customize Video Background](https://docs.heygen.com/docs/</docs/customize-video-background>)
-    * [Using Audio Source as Voice](https://docs.heygen.com/docs/</docs/using-audio-source-as-voice>)
-    * [Create Videos with Your Personal Avatar and Voice](https://docs.heygen.com/docs/</docs/create-videos-with-your-personal-avatar-and-voice>)
-    * [Create Transparent Avatar Videos in WebM Format](https://docs.heygen.com/docs/</docs/create-webm-avatar-videos>)
-  * [Generate Video from Template](https://docs.heygen.com/docs/</docs/generate-video-from-template-v2>)
-    * [Replace Image in Template](https://docs.heygen.com/docs/</docs/replace-image-in-template>)
-    * [Replace Video in Template](https://docs.heygen.com/docs/</docs/replace-video-in-template>)
-    * [Replace Avatar in Template](https://docs.heygen.com/docs/</docs/replace-avatar-in-template>)
-    * [Replace Text/Voice in Template](https://docs.heygen.com/docs/</docs/replace-text-in-template>)
-    * [Replace Audio in Template](https://docs.heygen.com/docs/</docs/replace-audio-in-template>)
-    * [Swap Image and Video in Template](https://docs.heygen.com/docs/</docs/swap-image-and-video-templates>)
-    * [Fit Property in Template](https://docs.heygen.com/docs/</docs/fit-property-in-template>)
-    * [Video Playback Styles in Template](https://docs.heygen.com/docs/</docs/video-playback-styles-in-template>)
-    * [Guide: Simple Python App for Generating Videos from HeyGen Templates](https://docs.heygen.com/docs/</docs/simple-python-app-for-generating-videos-from-heygen-templates>)
-  * [HeyGen's Webhook Events](https://docs.heygen.com/docs/</docs/using-heygens-webhook-events>)
-    * [Write Your Endpoint To Process Webhook Events](https://docs.heygen.com/docs/</docs/write-your-endpoint-to-process-webhook-events>)
-  * [Video Translate API](https://docs.heygen.com/docs/</docs/video-translate-api>)
-  * [Photo Avatars API](https://docs.heygen.com/docs/</docs/photo-avatars-api>)
-    * [Generate AI Avatar Photos](https://docs.heygen.com/docs/</docs/generate-ai-avatar-photos>)
-    * [Create and Train Photo Avatar Groups](https://docs.heygen.com/docs/</docs/create-and-train-photo-avatar-groups>)
-    * [Add Motion and Sound Effects to Your Photo Avatar](https://docs.heygen.com/docs/</docs/add-motion-and-sound-effects-to-your-photo-avatar>)
-    * [Create Videos with Photo Avatars](https://docs.heygen.com/docs/</docs/create-videos-with-photo-avatars>)
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
 
 
-## streaming with interactive avatars
-  * [Streaming API Overview](https://docs.heygen.com/docs/</docs/streaming-api>)
-    * [Streaming API Integration: using LiveKit](https://docs.heygen.com/docs/</docs/streaming-api-integration-with-livekit-v2>)
-    * [React Native Integration with Streaming API + LiveKit](https://docs.heygen.com/docs/</docs/react-native-integration-guide-with-streaming-api-livekit>)
-    * [(Alpha) Interactive Avatar Realtime API](https://docs.heygen.com/docs/</docs/interactive-avatar-realtime-api>)
-  * [Streaming Avatar SDK](https://docs.heygen.com/docs/</docs/streaming-avatar-sdk>)
-    * [Streaming Avatar SDK API Reference](https://docs.heygen.com/docs/</docs/streaming-avatar-sdk-reference>)
-    * [Demo: Interactive Avatar NextJS](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/InteractiveAvatarNextJSDemo>)
-  * [Demo: Create a Vite Project with Streaming SDK](https://docs.heygen.com/docs/</docs/creating-a-vite-project-with-streaming-sdk>)
-    * [Integrating OpenAI Assistant with Streaming SDK](https://docs.heygen.com/docs/</docs/integrate-with-opeanai-assistant>)
-    * [Adding Speech-to-Text Integration to Demo Project](https://docs.heygen.com/docs/</docs/adding-speech-to-text-integration-to-demo-project>)
-    * [Adding Built-in Voice Chat Integration to Demo Project](https://docs.heygen.com/docs/</docs/adding-built-in-voice-chat-integration-to-demo-project>)
-    * [Adding Chroma Key to Streaming Demo Project](https://docs.heygen.com/docs/</docs/adding-chroma-key-to-streaming-demo>)
-  * [Demo: Create an iOS App featuring Interactive Avatar](https://docs.heygen.com/docs/</docs/streaming-avatar-ios-sdk>)
-  * [Firewall Configuration](https://docs.heygen.com/docs/</docs/firewall-configuration>)
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
 
 
-## Automate with HeyGen API
-  * [Zapier Integration](https://docs.heygen.com/docs/</docs/create-an-avatar-video-with-zapier>)
-    * [Create an Avatar Video with Zapier](https://docs.heygen.com/docs/</docs/create-an-avatar-video-with-zapier>)
-    * [Create a Video From Template with Zapier](https://docs.heygen.com/docs/</docs/create-a-video-from-template-with-zapier>)
-  * [Personalized Video](https://docs.heygen.com/docs/</docs/personalized-video-service>)
-    * [Create personalized video template](https://docs.heygen.com/docs/</docs/create-personalized-video-template>)
-    * [Generate personalized videos from template via Google Sheets + Zapier](https://docs.heygen.com/docs/</docs/generate-personalized-videos-from-template-via-google-sheets-zapier>)
-    * [Generate personalized videos from template via API](https://docs.heygen.com/docs/<https:/community.heygen.com/public/clubs/api-builders-au0/resources/how-to-use-heygens-api-a-step-by-step-walkthrough>)
-    * [Deliver personalized videos via mail merge with Gmail](https://docs.heygen.com/docs/</docs/deliver-personalized-videos-via-mail-merge-with-gmail>)
-    * [Deliver personalized videos via HubSpot email](https://docs.heygen.com/docs/</docs/deliver-personalized-videos-via-hubspot-email>)
-    * [Automatically generate and deliver personalized videos via HubSpot + Zapier](https://docs.heygen.com/docs/</docs/automatically-generate-and-deliver-personalized-videos-via-hubspot-zapier>)
-    * [Upcoming changes to personalized video (Jan, 2025)](https://docs.heygen.com/docs/</docs/upcoming-changes-in-personalized-video-jan-2025>)
-    * [Sending Personalized Videos with the HeyGen HubSpot app](https://docs.heygen.com/docs/</docs/sending-personalized-videos-with-the-heygen-hubspot-app>)
-  * [Bulk Video Translation](https://docs.heygen.com/docs/</docs/bulk-video-translation>)
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
 
 
-## Other guides
-  * [HeyGen OAuth](https://docs.heygen.com/docs/</docs/heygen-oauth>)
-    * [Connecting Your App to HeyGen with OAuth 2.0](https://docs.heygen.com/docs/</docs/connecting-your-app-to-heygen-with-oauth-20>)
-  * [HeyGen MCP Server](https://docs.heygen.com/docs/</docs/heygen-mcp-server>)
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
 
 
-# Streaming Avatar SDK API Reference
-Streaming Avatar SDK API Reference
-[ Suggest Edits](https://docs.heygen.com/docs/</edit/streaming-avatar-sdk-reference>)
-The `@heygen/streaming-avatar`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK>) package provides a TypeScript SDK for interacting with HeyGen's streaming avatar service. For detailed information about the available methods, interfaces, enums, and event handling, refer to the API reference provided below.
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+# New Session
+post https://api.heygen.com/v1/streaming.new
+This endpoint is used to initiate a new streaming session.
+This endpoint is used to initiate a new streaming session with an Interactive Avatar. It sets up a fresh session, allowing for real-time interactions and communication.
 # 
-Classes
-[](https://docs.heygen.com/docs/<#classes>)
-### 
-`StreamingAvatar`
-[](https://docs.heygen.com/docs/<#streamingavatar>)
-This class is the core of the SDK, responsible for managing avatar streaming sessions, including session creation, controlling avatars, and handling real-time communication.
-TypeScriptTypeScript
-```
-const avatar = new StreamingAvatar({ token: "access-token" });
-
-```
-```
-constructor({ token, basePath }: StreamingAvatarApiConfig)
-
-```
-
+Request Body
+[](https://docs.heygen.com/reference/<#request-body>)
+Field| Type| Description  
+---|---|---  
+`quality`| string| The quality of the data to be retrieved. Can be "high", "medium", or "low". _high: 2000kbps and 720p. medium: 1000kbps and 480p.low: 500kbps and 360p._  
+`avatar_id`|  string (optional)| The ID of the Interactive Avatar to use. If not provided, a default avatar will be chosen. Default: `default`  
+`voice`| VoiceSetting(optional)| The settings for the Interactive Avatar's voice.  
+`stt_settings`| STTSetting(optional)**beta**|  The speech-to-text settings control how audio is converted into text.  
+`video_encoding`| string (optional)| Specifies the encoding format for streaming video. Can be "H264", "VP8". Default: `VP8`. _Note: Choosing "H264" may offer better compatibility with certain devices and platforms._  
+`knowledge_base`|  string (optional)| Knowledge Base prompt used for chat task type.  
+`version`| string (optional) **beta**|  Specifies the version to use. Currently, the only valid value is `v2`.Default: Not specified (uses v1).  
+`knowledge_base_id`| string (optional) **beta**|  The ID of the knowledge base to use for the avatar's responses. Only applicable when `version` is set to `v2`.  
+`disable_idle_timeout`| boolean(optional)| By default session has a 2 minute idle timeout, setting to true disables it. _⚠️ Do not use this feature without proper session management, as open sessions can consume your API credits!_  
+## 
+VoiceSetting
+[](https://docs.heygen.com/reference/<#voicesetting>)
+Field| Type| Description  
+---|---|---  
+`voice_id`| string (optional)| Voice for your Interactive Avatar. See the available voices by calling the [List Voices](https://docs.heygen.com/reference/</reference/list-voices-v2>) endpoint. _Note: Not every voice is supported in the streaming API._  
+`rate`|  float(optional)| Voice speed rate. Default is 1.  
+`emotion`| string (optional)| Emotion to use for Emotional voices. Available emotions are `Excited`, `Serious`, `Friendly`, `Soothing`, `Broadcaster`  
+`elevenlabs_settings`| ElevenlabsSettings (optional)| [Voice settings](https://docs.heygen.com/reference/<https:/elevenlabs.io/docs/api-reference/text-to-speech/convert-as-stream#request.body.voice_settings>) to pass over if the voice provider for the session is Elevenlabs.  
+## 
+ElevenlabsSettings
+[](https://docs.heygen.com/reference/<#elevenlabssettings>)
+Field| Type| Description  
+---|---|---  
+`stability`| float (optional)| Default is 0.75.  
+`model_id`| string(optional)| Voice model id. For ElevenLabs available models is: `eleven_flash_v2_5`, `eleven_multilingual_v2`. Default: `eleven_flash_v2_5`  
+`similarity_boost`| float(optional)| Default is 0.75.  
+`style`| float (optional)| Default is 0.0.  
+`use_speaker_boost`| bool (optional)| Default is true.  
+## 
+STTSettings
+[](https://docs.heygen.com/reference/<#sttsettings>)
+Field| Type| Description  
+---|---|---  
+`provider`| string (optional)**beta**|  STT model. Allowed values: `deepgram, gladia`  
+`confidence`| float(optional)| Default is 0.55.  
 # 
-Interfaces
-[](https://docs.heygen.com/docs/<#interfaces>)
-### 
-`StreamingAvatarApiConfig`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/70d0e9073dfc842c01555a6450ad742f8303c446/src/index.ts#L3-L6>)
-[](https://docs.heygen.com/docs/<#streamingavatarapiconfig>)
-Configuration object for initializing `StreamingAvatar`.
-Property| Type| Description  
----|---|---  
-`token`| `string`| Authentication token for the session. **Please note this is not your HeyGen API key.** You can retrieve this 'Session Token' by calling the create_token endpoint: [https://docs.heygen.com/reference/create-session-token](https://docs.heygen.com/docs/</reference/create-session-token>)  
-`basePath`| `string`| Base API URL (optional, defaults to `https://api.heygen.com`).  
-TypeScript
-```
-const config: StreamingAvatarApiConfig = {
- token: "access-token",
-};
-
-```
-
-### 
-`StartAvatarRequest`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/70d0e9073dfc842c01555a6450ad742f8303c446/src/index.ts#L13-L18>)[↗](https://docs.heygen.com/docs/</reference/new-session>)
-[](https://docs.heygen.com/docs/<#startavatarrequest>)
-Request payload to initiate a new avatar streaming session.
-Property| Type| Description  
----|---|---  
-`avatarName`| `string`| Interactive Avatar ID for the session. (default, `default`)  
-`quality`| `AvatarQuality`| (Optional) The desired quality level of the avatar stream.  
-`voice`| `VoiceSetting`| (Optional) [Voice settings](https://docs.heygen.com/docs/</reference/new-session#voicesetting>) for the avatar.  
-`knowledgeId`| `string`| (Optional) Knowledge base ID for the avatar's knowledge / prompt. Retrieve from [labs.heygen.com](https://docs.heygen.com/docs/<https:/labs.heygen.com/interactive-avatar>).  
-`knowledgeBase`| `string`| (Optional) This is used as a custom 'system prompt' for the LLM that powers the Avatar's responses when using the Talk task type in the [Speak request](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/455b0b07e4357bb3516a8a1c4e9808dd86715a4c/src/index.ts#L47-L50>) method.  
-`disableIdleTimeout`| `boolean`| (Optional) Controls the avatar's session timeout behavior. When true, prevents automatic session termination during periods of inactivity. _⚠️ Do not use this feature without proper session management, as open sessions can consume your API credits!_  
-TypeScript
-```
-const startRequest: StartAvatarRequest = {
- quality: AvatarQuality.High,
- avatarName: avatarId,
- knowledgeId: knowledgeId,
- // knowledgeBase: knowledgeBase,
- voice: {
-  voiceId: voiceId,
-  rate: 1.5, // 0.5 ~ 1.5
-  emotion: VoiceEmotion.EXCITED,
- },
- language: language,
- disableIdleTimeout: true
-};
-
-```
-
-### 
-`StartAvatarResponse`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/70d0e9073dfc842c01555a6450ad742f8303c446/src/index.ts#L20-L26>)
-[](https://docs.heygen.com/docs/<#startavatarresponse>)
-The response received when an avatar session is successfully started.
-Property| Type| Description  
----|---|---  
-`session_id`| `string`| The unique ID of the streaming session.  
-`access_token`| `string`| Token to authenticate further interactions.  
-`url`| `string`| WebSocket URL for establishing the streaming session.  
-`is_paid`| `boolean`| Indicates whether the session is under a paid plan.  
-`session_duration_limit`| `number`| Maximum allowed duration for the session in seconds.  
 Response
-```
-{
- "session_id": "eba59f0d-71f5-11ef-b8af-d2e5560124bc",
- "sdp": null,
- "access_token": "eyJhbGc...",
- "url": "wss://heygen-feapbkvq.livekit.cloud",
- "ice_servers": null,
- "ice_servers2": null,
- "is_paid": true,
- "session_duration_limit": 600
-}
-
-```
-
-### 
-`SpeakRequest`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/455b0b07e4357bb3516a8a1c4e9808dd86715a4c/src/index.ts#L47-L50>)[↗](https://docs.heygen.com/docs/</reference/send-task>)
-[](https://docs.heygen.com/docs/<#speakrequest>)
-Request payload for sending a speaking command to the avatar.
-Property| Type| Description  
+[](https://docs.heygen.com/reference/<#response>)
+**Field**| **Type**| **Description**  
 ---|---|---  
-`text`| `string`| The textual content the avatar will vocalize and synchronize with its movements.  
-`taskType`| `string`| Defines the speaking behavior mode. Options include TaskType.TALK and TaskType.REPEAT.  
-`taskMode`| `string`| Specifies synchronization strategy. `SYNC` blocks further actions until speaking completes, `ASYNC` allows concurrent processing.  
-TypeScript
-```
-const speakRequest: SpeakRequest = {
- text: "Hello, there!",
- task_type: TaskType.REPEAT
-};
+`code`|  integer| The response status code.  
+`message`| string| A message providing more details about the request's result, typically explaining success or error.  
+`data`| object| Contains the main data for the response.  
+`data.session_id`| string| A unique identifier for the session.  
+`data.url`| string| The WebSocket URL for accessing the LiveKit room (e.g., `wss://heygen-feapbkvq.livekit.cloud`).  
+`data.access_token`| string| The access token required to authenticate and join the LiveKit room.  
+`data.session_duration_limit`| integer| The maximum allowed duration (in seconds) for the session, indicating any session time limits.  
+`data.is_paid`| boolean| A flag indicating whether the session is part of a paid plan.  
+`data.realtime_endpoint`| string| The real-time endpoint URL for alpha implementations, which could be used for experimental features (e.g., `wss://webrtc-signaling.heygen.io/v2-alpha/...`).  
+Language
+ShellNodeRubyPHPPython
+Credentials
+Header
+Header
+RESPONSE
+Click `Try It!` to start a request and see the response here!
+![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=78aa14d9-172f-4630-b278-90566b42e855&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=b54c409f-fc5e-4126-a834-8039ef49b613&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fnew-session&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=78aa14d9-172f-4630-b278-90566b42e855&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=b54c409f-fc5e-4126-a834-8039ef49b613&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fnew-session&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
 
-```
 
+---
+
+## https://docs.heygen.com/reference/start-session
+
+[Jump to Content](https://docs.heygen.com/reference/<#content>)
+[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/start-session>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+API Reference
+[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/start-session>)
+Moon (Dark Mode)Sun (Light Mode)
+v4.0.8
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)Start Session
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+# Start Session
+post https://api.heygen.com/v1/streaming.start
+This endpoint is used to start the connection for an existing streaming session.
+This endpoint is used to start an existing streaming session and establish the connection between the client and the Interactive Avatar. It activates the session, enabling communication and interaction.
 # 
-Methods
-[](https://docs.heygen.com/docs/<#methods>)
-### 
-`createStartAvatar`
-[](https://docs.heygen.com/docs/<#createstartavatar>)
-Starts a new avatar session using the provided configuration and returns session information.
-TypeScriptTypeScript
-```
-createStartAvatar(requestData: StartAvatarRequest): Promise<any>
-
-```
-```
-const startRequest = { /* configuration settings */ };
-const response = await createStartAvatar(startRequest);
-console.log(response.session_id); // Store session ID for future operations
-
-```
-
-### 
-`startVoiceChat`
-[](https://docs.heygen.com/docs/<#startvoicechat>)
-Starts a voice chat within the active avatar session. You can optionally enable or disable silence prompts during the chat by setting the `useSilencePrompt` flag
-TypeScriptTypeScript
-```
-startVoiceChat(requestData: { useSilencePrompt?: boolean } = {}): Promise<any>
-
-```
-```
-await startVoiceChat({ useSilencePrompt: false });
-
-```
-
-Property| Type| Description  
+Request Body
+[](https://docs.heygen.com/reference/<#request-body>)
+Field| Type| Description  
 ---|---|---  
-`useSilencePrompt`| `boolean`| (Optional) Controls automatic conversational prompts during periods of user inactivity. Enables fallback conversational strategies.  
-`isInputAudioMuted`| `boolean`| (Optional) Determines whether the user's microphone input is muted during the voice chat session. When set to `true`, the avatar will not receive audio input from the user.  
-### 
-`closeVoiceChat`
-[](https://docs.heygen.com/docs/<#closevoicechat>)
-Ends the active voice chat session within the avatar interaction.
-TypeScriptTypeScript
-```
-closeVoiceChat(): Promise<any>
-
-```
-```
-await closeVoiceChat();
-
-```
-
-### 
-`newSession`
-[](https://docs.heygen.com/docs/<#newsession>)
-Creates and starts a new session using the provided `StartAvatarRequest` data, returning detailed session information such as the session ID and other metadata.
-TypeScriptTypeScript
-```
-newSession(requestData: StartAvatarRequest): Promise<StartAvatarResponse>
-
-```
-```
-const sessionData = await newSession(startRequest);
-console.log("New session created:", sessionData);
-
-```
-
-### 
-`startSession`
-[](https://docs.heygen.com/docs/<#startsession>)
-Starts an existing avatar session by using the previously stored session ID or configuration from a `StartAvatarRequest`.
-TypeScriptTypeScript
-```
-startSession(): Promise<any>
-
-```
-```
-const response = await startSession(sessionRequest);
-console.log("Session started:", response);
-
-```
-
-### 
-`speak`
-[](https://docs.heygen.com/docs/<#speak>)
-Sends a command to the avatar to speak the provided text. Additional parameters like `task_type` allow for more advanced control, like repeating or talking.
-TypeScriptTypeScript
-```
-speak(requestData: SpeakRequest): Promise<any>
-
-```
-```
-await speak({ text: "Hello, world!", task_type: TaskType.REPEAT });
-
-```
-
-### 
-`startListening`
-[](https://docs.heygen.com/docs/<#startlistening>)
-Activates the avatar’s listening mode, allowing it to process incoming audio or messages from the user.
-TypeScriptTypeScript
-```
-startListening(): Promise<any>
-
-```
-```
-await startListening({});
-
-```
-
-### 
-`stopListening`
-[](https://docs.heygen.com/docs/<#stoplistening>)
-Stops the avatar from listening to incoming audio or messages.
-TypeScriptTypeScript
-```
-stopListening(): Promise<any>
-
-```
-```
-await stopListening({});
-
-```
-
-### 
-`interrupt`
-[](https://docs.heygen.com/docs/<#interrupt>)
-Interrupts the current speaking task.
-TypeScriptTypeScript
-```
-interrupt(): Promise<any>
-
-```
-```
-await interrupt({});
-
-```
-
-### 
-`stopAvatar`
-[](https://docs.heygen.com/docs/<#stopavatar>)
-Stops the avatar session.
-TypeScriptTypeScript
-```
-stopAvatar(): Promise<any>
-
-```
-```
-await stopAvatar({});
-
-```
-
-### 
-`on`
-[](https://docs.heygen.com/docs/<#on>)
-Registers an event listener for specific streaming events.
-TypeScriptTypeScript
-```
-on(eventType: string, listener: EventHandler): this
-
-```
-```
-on('messageReceived', (message) => {
- console.log("Received message:", message);
-});
-
-```
-
-### 
-off
-[](https://docs.heygen.com/docs/<#off>)
-Unregisters an event listener.
-TypeScriptTypeScript
-```
-off(eventType: string, listener: EventHandler): this
-
-```
-```
-off('messageReceived', listenerFunction);
-
-```
-
+`session_id`| string| The ID of the session that you want to start.  
 # 
-Types and Enums
-[](https://docs.heygen.com/docs/<#types-and-enums>)
-### 
-`AvatarQuality`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/70d0e9073dfc842c01555a6450ad742f8303c446/src/index.ts#L8-L12>)
-[](https://docs.heygen.com/docs/<#avatarquality>)
-Defines the quality settings for the avatar.
-  * **High** : `'high'` - 2000kbps and 720p.
-  * **Medium** : `'medium'` - 1000kbps and 480p.
-  * **Low** : `'low'` - 500kbps and 360p.
+Response Body
+[](https://docs.heygen.com/reference/<#response-body>)
+Field| Type| Description  
+---|---|---  
+`status`| string| The response status.  
+Language
+ShellNodeRubyPHPPython
+Credentials
+Header
+Header
+RESPONSE
+Click `Try It!` to start a request and see the response here!
+![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=28b16167-e200-44e1-baf4-7408ec4e121e&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=f5db57ad-af11-40fa-b9d8-57b30786eb72&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fstart-session&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=28b16167-e200-44e1-baf4-7408ec4e121e&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=f5db57ad-af11-40fa-b9d8-57b30786eb72&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fstart-session&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
 
 
-### 
-`VoiceEmotion`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/455b0b07e4357bb3516a8a1c4e9808dd86715a4c/src/index.ts#L15-L21>)
-[](https://docs.heygen.com/docs/<#voiceemotion>)
-  * **`EXCITED`**: Excited voice emotion.
-  * **`SERIOUS`**: Serious voice emotion.
-  * **`FRIENDLY`**: Friendly voice emotion.
-  * **`SOOTHING`**: Soothing voice emotion.
-  * **`BROADCASTER`**: Broadcaster voice emotion.
+---
+
+## https://docs.heygen.com/reference/send-task
+
+[Jump to Content](https://docs.heygen.com/reference/<#content>)
+[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/send-task>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+API Reference
+[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/send-task>)
+Moon (Dark Mode)Sun (Light Mode)
+v4.0.8
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)Send Task
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
 
 
-### 
-`TaskType`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/455b0b07e4357bb3516a8a1c4e9808dd86715a4c/src/index.ts#L43-L46>)
-[](https://docs.heygen.com/docs/<#tasktype>)
-  * **`TALK`**: Avatar will talk in response to the`Text` sent in tasks of this type; the response will be provided by HeyGen's connection to GPT-4o mini, and influenced by the `KnowledgeID` or `KnowledgeBase`that were provided when calling the `StartAvatarRequest` method.
-  * **`REPEAT`**: Avatar will simply repeat the`Text` sent in tasks of this type; this task type is commonly used by developers who process a user's input independently, via an LLM of their choosing, and send the LLM's response as a **Repeat** task for the Avatar to say.
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
 
 
-### 
-`StreamingEvents`[](https://docs.heygen.com/docs/<https:/github.com/HeyGen-Official/StreamingAvatarSDK/blob/70d0e9073dfc842c01555a6450ad742f8303c446/src/index.ts#L50-L61>)
-[](https://docs.heygen.com/docs/<#streamingevents>)
-Enumerates the event types for streaming. See [Event Handling](https://docs.heygen.com/docs/<#event-handling>) for details.
-  * **`AVATAR_START_TALKING`**: Emitted when the avatar starts speaking.
-  * **`AVATAR_STOP_TALKING`**: Emitted when the avatar stops speaking.
-  * **`AVATAR_TALKING_MESSAGE`**: Triggered when the avatar sends a speaking message.
-  * **`AVATAR_END_MESSAGE`**: Triggered when the avatar finishes sending messages.
-  * **`USER_TALKING_MESSAGE`**: Emitted when the user sends a speaking message.
-  * **`USER_END_MESSAGE`**: Triggered when the user finishes sending messages.
-  * **`USER_START`**: Indicates when the user starts interacting.
-  * **`USER_STOP`**: Indicates when the user stops interacting.
-  * **`USER_SILENCE`**: Indicates when the user is silent.
-  * **`STREAM_READY`**: Indicates that the stream is ready for display.
-  * **`STREAM_DISCONNECTED`**: Triggered when the stream disconnects.
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
 
 
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+# Send Task
+post https://api.heygen.com/v1/streaming.task
+This endpoint is used to send a text to an Interactive Avatar, prompting it to speak the provided text.
 # 
-Event Handling
-[](https://docs.heygen.com/docs/<#event-handling>)
-The SDK emits a variety of events during a streaming session, which can be captured to update the UI or trigger additional logic. Use the `on` and `off` methods to manage event listeners.
-### 
-`AVATAR_START_TALKING`
-[](https://docs.heygen.com/docs/<#avatar_start_talking>)
-This event is emitted when the avatar begins speaking.
-TypeScript
-```
-avatar.on(StreamingEvents.AVATAR_START_TALKING, (event) => {
- console.log('Avatar has started talking:', event);
- // You can update the UI to reflect that the avatar is talking
-});
-
-```
-
-### 
-`AVATAR_STOP_TALKING`
-[](https://docs.heygen.com/docs/<#avatar_stop_talking>)
-TypeScript
-```
-avatar.on(StreamingEvents.AVATAR_STOP_TALKING, (event) => {
- console.log('Avatar has stopped talking:', event);
- // You can reset the UI to indicate the avatar has stopped speaking
-});
-
-```
-
-### 
-`AVATAR_TALKING_MESSAGE`
-[](https://docs.heygen.com/docs/<#avatar_talking_message>)
-Fired when the avatar sends a message while talking. This event can be useful for real-time updates on what the avatar is currently saying.
-TypeScript
-```
-avatar.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (message) => {
- console.log('Avatar talking message:', message);
- // You can display the message in the UI
-});
-
-```
-
-### 
-`AVATAR_END_MESSAGE`
-[](https://docs.heygen.com/docs/<#avatar_end_message>)
-Fired when the avatar sends the final message before ending its speech.
-TypeScript
-```
-avatar.on(StreamingEvents.AVATAR_END_MESSAGE, (message) => {
- console.log('Avatar end message:', message);
- // Handle the end of the avatar's message, e.g., indicate the end of the conversation
-});
-
-```
-
-### 
-`USER_TALKING_MESSAGE`
-[](https://docs.heygen.com/docs/<#user_talking_message>)
-Fired when the user sends a message to the avatar.
-TypeScript
-```
-avatar.on(StreamingEvents.USER_TALKING_MESSAGE, (message) => {
- console.log('User talking message:', message);
- // Handle the user's message input to the avatar
-});
-
-```
-
-### 
-`USER_END_MESSAGE`
-[](https://docs.heygen.com/docs/<#user_end_message>)
-Fired when the user has finished sending their message to the avatar.
-TypeScript
-```
-avatar.on(StreamingEvents.USER_END_MESSAGE, (message) => {
- console.log('User end message:', message);
- // Handle the end of the user's message, e.g., process the user's response
-});
-
-```
-
-### 
-`USER_START`
-[](https://docs.heygen.com/docs/<#user_start>)
-Fired when the user has finished sending their message to the avatar.
-TypeScript
-```
-avatar.on(StreamingEvents.USER_START, (event) => {
- console.log('User has started interaction:', event);
- // Handle the start of the user's interaction, such as activating a listening indicator
-});
-
-```
-
-### 
-`USER_STOP`
-[](https://docs.heygen.com/docs/<#user_stop>)
-Triggered when the user stops interacting or speaking with the avatar.
-TypeScript
-```
-avatar.on(StreamingEvents.USER_STOP, (event) => {
- console.log('User has stopped interaction:', event);
- // Handle the end of the user's interaction, such as deactivating a listening indicator
-});
-
-```
-
-### 
-`USER_SILENCE`
-[](https://docs.heygen.com/docs/<#user_silence>)
-Triggered when the user is silent for a certain period.
-TypeScript
-```
-avatar.on(StreamingEvents.USER_SILENCE, () => {
- console.log('User is silent');
-});
-
-```
-
-### 
-`STREAM_READY`
-[](https://docs.heygen.com/docs/<#stream_ready>)
-Fired when the avatar's streaming session is ready.
-TypeScript
-```
-avatar.on(StreamingEvents.STREAM_READY, (event) => {
- console.log('Stream is ready:', event.detail);
- // Use event.detail to attach the media stream to a video element, for example
-});
-
-```
-
-### 
-`STREAM_DISCONNECTED`
-[](https://docs.heygen.com/docs/<#stream_disconnected>)
-Triggered when the streaming connection is lost or intentionally disconnected.
-TypeScript
-```
-avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
- console.log('Stream has been disconnected');
- // Handle the disconnection, e.g., clean up the UI or try to reconnect the session
-});
-
-```
-
+Request Body
+[](https://docs.heygen.com/reference/<#request-body>)
+Field| Type| Description  
+---|---|---  
+`session_id`| string| The ID of the session to which the task is to be sent.  
+`text`| string| The text of the task.  
+`task_mode`| string| Whether the task is performed synchronously or not (available values: sync and async; default is sync)  
+`task_type`| string| Task type: `repeat` or `chat` ( repeat will simply repeat the input text; for chat type, input text is the message to the avatar and avatar will respond according to the knowledge base set in `streaming.new` API  
 # 
-Error Handling
-[](https://docs.heygen.com/docs/<#error-handling>)
-Always handle errors gracefully when dealing with asynchronous requests to avoid disruptions in the user experience.
-TypeScript
-```
-try {
- await avatar.speak({ text: 'Hello!' });
-} catch (error) {
- console.error('Error sending speak command:', error);
-}
+Response Body
+[](https://docs.heygen.com/reference/<#response-body>)
+Field| Type| Description  
+---|---|---  
+`duration_ms`| float| how long the avatar speaks for the input text  
+`task_id`| string| id to reference the task  
+Language
+ShellNodeRubyPHPPython
+Credentials
+Header
+Header
+RESPONSE
+Click `Try It!` to start a request and see the response here!
+![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=6c6defb5-a02c-4990-a209-c22f33c175e8&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=4db9f112-2544-4de6-ac9f-90b5c4de7c60&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fsend-task&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=6c6defb5-a02c-4990-a209-c22f33c175e8&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=4db9f112-2544-4de6-ac9f-90b5c4de7c60&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fsend-task&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
 
-```
 
+---
+
+## https://docs.heygen.com/reference/close-session
+
+[Jump to Content](https://docs.heygen.com/reference/<#content>)
+[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/close-session>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+API Reference
+[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/close-session>)
+Moon (Dark Mode)Sun (Light Mode)
+v4.0.8
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)Close Session
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+# Close Session
+post https://api.heygen.com/v1/streaming.stop
+This endpoint is used to terminate an active streaming session.
 # 
-Conclusion
-[](https://docs.heygen.com/docs/<#conclusion>)
-This reference offers a comprehensive overview of HeyGen's streaming avatar SDK, complete with examples and descriptions of methods, events, and configuration options.
-Updated 21 days ago 
-  * [Table of Contents](https://docs.heygen.com/docs/<#>)
-  *     * [Classes](https://docs.heygen.com/docs/<#classes>)
-    * [Interfaces](https://docs.heygen.com/docs/<#interfaces>)
-    * [Methods](https://docs.heygen.com/docs/<#methods>)
-    * [Types and Enums](https://docs.heygen.com/docs/<#types-and-enums>)
-    * [Event Handling](https://docs.heygen.com/docs/<#event-handling>)
-    * [Error Handling](https://docs.heygen.com/docs/<#error-handling>)
-    * [Conclusion](https://docs.heygen.com/docs/<#conclusion>)
+Request Body
+[](https://docs.heygen.com/reference/<#request-body>)
+Field| Type| Description  
+---|---|---  
+`session_id`| string| The ID of the session to be stopped.  
+# 
+Response Body
+[](https://docs.heygen.com/reference/<#response-body>)
+Field| Type| Description  
+---|---|---  
+`status`| string| The status of the response. If the session is successfully stopped, it will return "success".  
+Language
+ShellNodeRubyPHPPython
+Credentials
+Header
+Header
+RESPONSE
+Click `Try It!` to start a request and see the response here!
+![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=1f184bda-b36d-4c3b-b047-42f73c3e5fff&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=bbb9e93e-98e8-43c7-9e1b-b9aaa3d86959&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fclose-session&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=1f184bda-b36d-4c3b-b047-42f73c3e5fff&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=bbb9e93e-98e8-43c7-9e1b-b9aaa3d86959&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fclose-session&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
 
 
-![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=74b0b2f3-9767-4b9b-a944-672c8951ef89&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=42a31c7c-7860-4553-a524-9faba2ac02d1&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Fdocs%2Fstreaming-avatar-sdk-reference&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=74b0b2f3-9767-4b9b-a944-672c8951ef89&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=42a31c7c-7860-4553-a524-9faba2ac02d1&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Fdocs%2Fstreaming-avatar-sdk-reference&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
+---
+
+## https://docs.heygen.com/reference/interrupt-task
+
+[Jump to Content](https://docs.heygen.com/reference/<#content>)
+[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/interrupt-task>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+API Reference
+[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/interrupt-task>)
+Moon (Dark Mode)Sun (Light Mode)
+v4.0.8
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)Interrupt Task
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+# Interrupt Task
+post https://api.heygen.com/v1/streaming.interrupt
+This endpoint is used to interrupt the speaking of an Interactive Avatar.
+This endpoint is used to interrupt the speaking of an Interactive Avatar. If the avatar is not speaking at the time the API call is made, the _interrupt_ functionality has no effect.
+Language
+ShellNodeRubyPHPPython
+Credentials
+Header
+Header
+RESPONSE
+Click `Try It!` to start a request and see the response here!
+![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=174fb7f9-5edc-4ccd-a245-3f8ee4810bf5&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=ed0bea3f-e184-460d-8a6f-ba307642f315&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Finterrupt-task&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=174fb7f9-5edc-4ccd-a245-3f8ee4810bf5&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=ed0bea3f-e184-460d-8a6f-ba307642f315&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Finterrupt-task&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
+
+
+---
+
+## https://docs.heygen.com/reference/create-session-token
+
+[Jump to Content](https://docs.heygen.com/reference/<#content>)
+[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)v4.0.8[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/create-session-token>)[![HeyGen API Documentation](https://files.readme.io/cfe89b99576b58ffc0eff1d7774dfe123e10a143f2db69270ecaab7ea4b9faf5-small-Logo_5.png)](https://docs.heygen.com/reference/</>)
+API Reference
+[Log In](https://docs.heygen.com/reference/</login?redirect_uri=/reference/create-session-token>)
+Moon (Dark Mode)Sun (Light Mode)
+v4.0.8
+[Home](https://docs.heygen.com/reference/</>)[Documentation](https://docs.heygen.com/reference/</docs>)[API Reference](https://docs.heygen.com/reference/</reference>)[Updates](https://docs.heygen.com/reference/</changelog>)[Discussions](https://docs.heygen.com/reference/</discuss>)[Tools](https://docs.heygen.com/reference/</page/tools>)[Community](https://docs.heygen.com/reference/<https:/community.heygen.com/>)[Help](https://docs.heygen.com/reference/<https:/help.heygen.com/en/>)Create Session Token
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+JUMP TO
+## Overview
+  * [Authentication](https://docs.heygen.com/reference/</reference/authentication>)
+  * [Limits](https://docs.heygen.com/reference/</reference/limits>)
+  * [Postman Collections](https://docs.heygen.com/reference/</reference/postman-collections>)
+  * [Error Responses](https://docs.heygen.com/reference/</reference/errors>)
+
+
+## Avatars and Voices
+  * [List All Avatars (V2)get](https://docs.heygen.com/reference/</reference/list-avatars-v2>)
+  * [List All Voices (V2)get](https://docs.heygen.com/reference/</reference/list-voices-v2>)
+  * [List All Locales for Voicesget](https://docs.heygen.com/reference/</reference/list-all-locales-for-voices>)
+  * [List All Avatar Groupsget](https://docs.heygen.com/reference/</reference/list-all-avatar-groups>)
+  * [List All Avatars in one avatar groupget](https://docs.heygen.com/reference/</reference/list-all-avatars-in-one-avatar-group>)
+  * [Retrieve Avatar Detailsget](https://docs.heygen.com/reference/</reference/retrieve-avatar-details>)
+
+
+## Video Generation
+  * [Create Avatar Video (V2)post](https://docs.heygen.com/reference/</reference/create-an-avatar-video-v2>)
+  * [Retrieve Video Status/Detailsget](https://docs.heygen.com/reference/</reference/video-status>)
+  * [Delete a Videodelete](https://docs.heygen.com/reference/</reference/delete-a-video>)
+  * [Create a WebM Videopost](https://docs.heygen.com/reference/</reference/create-a-webm-video>)
+
+
+## Video Management
+  * [Retrieve Video Listget](https://docs.heygen.com/reference/</reference/video-list>)
+  * [Retrieve Sharable Video URLpost](https://docs.heygen.com/reference/</reference/retrieve-sharable-video-url>)
+
+
+## templates
+  * [List Templatesget](https://docs.heygen.com/reference/</reference/list-templates-v2>)
+  * [Retrieve Template Detailsget](https://docs.heygen.com/reference/</reference/get-template-v2>)
+  * [Generate Video from Templatepost](https://docs.heygen.com/reference/</reference/generate-from-template-v2>)
+
+
+## video translation
+  * [List Supported Languagesget](https://docs.heygen.com/reference/</reference/list-supported-languages>)
+  * [Translate Videopost](https://docs.heygen.com/reference/</reference/video-translate>)
+  * [Check Translation Statusget](https://docs.heygen.com/reference/</reference/video-translate-status>)
+  * [Video Translate Captionget](https://docs.heygen.com/reference/</reference/video-translate-caption>)
+
+
+## STREAMING API
+  * [New Sessionpost](https://docs.heygen.com/reference/</reference/new-session>)
+  * [Start Sessionpost](https://docs.heygen.com/reference/</reference/start-session>)
+  * [List Sessions (Active)get](https://docs.heygen.com/reference/</reference/list-sessions>)
+  * [List Sessions (History)get](https://docs.heygen.com/reference/</reference/list-sessions-v2>)
+  * [Send Taskpost](https://docs.heygen.com/reference/</reference/send-task>)
+  * [Close Sessionpost](https://docs.heygen.com/reference/</reference/close-session>)
+  * [Interrupt Taskpost](https://docs.heygen.com/reference/</reference/interrupt-task>)
+  * [Create Session Tokenpost](https://docs.heygen.com/reference/</reference/create-session-token>)
+  * [List Streaming Avatarsget](https://docs.heygen.com/reference/</reference/streaming-avatar-list>)
+
+
+## PHOTO AVATARS
+  * [Generate photo avatar photospost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-photos>)
+  * [Check photo/look generation statusget](https://docs.heygen.com/reference/</reference/check-photolook-generation-status>)
+  * [Create photo avatar grouppost](https://docs.heygen.com/reference/</reference/create-photo-avatar-group>)
+  * [Add looks to photo avatar grouppost](https://docs.heygen.com/reference/</reference/add-looks-to-photo-avatar-group>)
+  * [Train photo avatar grouppost](https://docs.heygen.com/reference/</reference/train-photo-avatar-group>)
+  * [Get training job statusget](https://docs.heygen.com/reference/</reference/get-training-job-status>)
+  * [Generate photo avatar lookspost](https://docs.heygen.com/reference/</reference/generate-photo-avatar-looks>)
+  * [Add motionpost](https://docs.heygen.com/reference/</reference/add-motion>)
+  * [Add sound effectpost](https://docs.heygen.com/reference/</reference/add-sound-effect>)
+  * [Photo avatar detailsget](https://docs.heygen.com/reference/</reference/photo-avatar-details>)
+  * [Upscale an avatarpost](https://docs.heygen.com/reference/</reference/upscale-an-avatar>)
+  * [Delete photo avatardelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-by-id>)
+  * [Delete photo avatar groupdelete](https://docs.heygen.com/reference/</reference/delete-photo-avatar-group>)
+
+
+## User
+  * [Get Remaining Quotaget](https://docs.heygen.com/reference/</reference/get-remaining-quota-v2>)
+  * [Get Current User Informationget](https://docs.heygen.com/reference/</reference/get-current-user-information>)
+
+
+## Brand
+  * [List Brand Voicesget](https://docs.heygen.com/reference/</reference/list-brand-voices>)
+  * [Update Brand Voicepost](https://docs.heygen.com/reference/</reference/update-brand-voice>)
+
+
+## Assets
+  * [Upload Assetpost](https://docs.heygen.com/reference/</reference/upload-asset>)
+
+
+## WEBHOOK
+  * [List Webhook Endpointsget](https://docs.heygen.com/reference/</reference/list-webhook-endpoints>)
+  * [Add a Webhook Endpointpost](https://docs.heygen.com/reference/</reference/add-a-webhook-endpoint>)
+  * [Update a Webhook Endpointpatch](https://docs.heygen.com/reference/</reference/update-a-webhook-endpoint>)
+  * [Delete a Webhook Endpointdelete](https://docs.heygen.com/reference/</reference/delete-a-webhook-endpoint>)
+  * [List Available Webhook Eventsget](https://docs.heygen.com/reference/</reference/list-available-webhook-events>)
+
+
+## Folders
+  * [List Foldersget](https://docs.heygen.com/reference/</reference/list-folders>)
+  * [Create Folderpost](https://docs.heygen.com/reference/</reference/create-folder>)
+  * [Update Folder (Rename Only)post](https://docs.heygen.com/reference/</reference/update-folder>)
+  * [Trash Folderpost](https://docs.heygen.com/reference/</reference/trash-folder>)
+  * [Restore Folderpost](https://docs.heygen.com/reference/</reference/restore-folder>)
+
+
+# Create Session Token
+post https://api.heygen.com/v1/streaming.create_token
+This endpoint is used to generate a new access token for a streaming session.
+> ## 📘
+> You need to generate a new access token for each streaming session. Each session must have a unique token.
+# 
+Response Body
+[](https://docs.heygen.com/reference/<#response-body>)
+Field| Type| Description  
+---|---|---  
+`error`| integer| The error information, if any. `null` if no error.  
+`data`| object| Contains the result data.  
+`data.token`| string| The generated access token for the streaming session.  
+Language
+ShellNodeRubyPHPPython
+Credentials
+Header
+Header
+RESPONSE
+Click `Try It!` to start a request and see the response here!
+![](https://t.co/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=d70e149f-e321-4189-96cd-dadb02ad91b9&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=886641fd-ad8c-4665-a56f-8f775de5ce32&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fcreate-session-token&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)![](https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FLos_Angeles%26en-US%26Google%20Inc.%26MacIntel%26127%261080%26600%268%2630%261080%26600%260%26na&eci=3&event=%7B%7D&event_id=d70e149f-e321-4189-96cd-dadb02ad91b9&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=886641fd-ad8c-4665-a56f-8f775de5ce32&tw_document_href=https%3A%2F%2Fdocs.heygen.com%2Freference%2Fcreate-session-token&tw_iframe_status=0&txn_id=of0u6&type=javascript&version=2.3.33)
+
+
+---
+
