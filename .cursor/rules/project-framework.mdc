@@ -30,6 +30,6 @@ alwaysApply: true
 
 6. .env.development
 
-7. [api_doc.md](mdc:api_doc.md)
+7. [akool_doc.md](mdc:akool_doc.md)
 
 
