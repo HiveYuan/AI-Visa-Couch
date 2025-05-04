@@ -22,7 +22,7 @@ type Message = {
 
 interface AkoolVideoChatProps {
   apiToken: string;
-  openaiApiKey: string;
+  openaiApiKey?: string;
   avatarId?: string;
 }
 
@@ -134,7 +134,7 @@ export default function AkoolVideoChat({
         speechRecognizerRef.current.stop().catch(console.error);
       }
     };
-  }, [apiToken, openaiApiKey]);
+  }, [apiToken]);
 
   // 创建会话并加入通话
   const initSession = async (AgoraRTC: any) => {
