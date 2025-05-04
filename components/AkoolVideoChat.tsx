@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AkoolService, AkoolSessionCreateResponse } from '@/services/akool';
 import { OpenAIRecognizer, createSpeechRecognizer } from '@/aisdk/speech';
 import { InterviewMessage, InterviewOptions } from '@/aisdk/interview';
-import { getInterviewSystemPrompt } from '@/aisdk/interview/prompts';
+import { getInterviewSystemPrompt, getCoachSystemPrompt } from '@/aisdk/interview/prompts';
 
 // 定义消息类型（从InterviewChat组件复用）
 type Message = {
@@ -33,11 +33,11 @@ export default function AkoolVideoChat({
 }: AkoolVideoChatProps) {
   // 面试配置
   const interviewOptions: InterviewOptions = {
-    visaType: "对话助手",
-    interviewType: "通用对话",
-    travelPurpose: "咨询",
-    language: "Chinese",
-    difficulty: "Easy"
+    visaType: "B1/B2 (Business/Tourism Visa)",
+    interviewType: "Standard Interview",
+    travelPurpose: "Tourism",
+    language: "English",
+    difficulty: "Medium"
   };
   
   // 基础状态
@@ -69,6 +69,7 @@ export default function AkoolVideoChat({
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
   const [showReasoningPanel, setShowReasoningPanel] = useState(false);
   const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
+  const [promptType, setPromptType] = useState<'standard' | 'coach'>('coach');
 
   // 初始化Akool和语音识别
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function AkoolVideoChat({
     if (typeof window !== 'undefined') {
       speechRecognizerRef.current = createSpeechRecognizer('openai', {
         apiKey: openaiApiKey,
-        language: 'zh'
+        language: 'en'
       }) as OpenAIRecognizer;
       
       speechRecognizerRef.current.onResult((text, isFinal) => {
@@ -166,17 +167,24 @@ export default function AkoolVideoChat({
   // 初始化对话
   const initConversation = async () => {
     try {
+      // 根据选择的 promptType 获取适当的系统提示
+      const systemPrompt = promptType === 'coach' 
+        ? getCoachSystemPrompt(interviewOptions) 
+        : getInterviewSystemPrompt(interviewOptions);
+      
       // 系统提示消息
       const systemMessage: Message = {
         role: "system",
-        content: getInterviewSystemPrompt(interviewOptions),
+        content: systemPrompt,
       };
       
       setMessages([systemMessage]);
       setIsStarted(true);
       
       // 生成第一个问题（欢迎语）
-      const initialReasoning = "我应该先问一个开放性的问题，了解用户的需求";
+      const initialReasoning = promptType === 'coach'
+        ? "我应该先以教练和签证官的身份介绍自己，然后问一个开放性的问题，了解用户的需求"
+        : "我应该先问一个开放性的问题，了解用户的需求";
       
       // 通过API获取第一个问题
       const questionResponse = await fetch("/api/interview/next-question", {
