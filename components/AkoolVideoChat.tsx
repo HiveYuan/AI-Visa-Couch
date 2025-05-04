@@ -78,7 +78,7 @@ export default function AkoolVideoChat({
     // 初始化语音识别
     if (typeof window !== 'undefined') {
       speechRecognizerRef.current = createSpeechRecognizer('openai', {
-        apiKey: openaiApiKey,
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
         language: 'en'
       }) as OpenAIRecognizer;
       
